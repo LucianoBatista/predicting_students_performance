@@ -1,6 +1,10 @@
 ---
 title: "Home"
-output: html_document
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 ---
 
 Como desafio para o processo seletivo de Cientista de Dados da Trybe foi solicitado a resolução de um problema de negócio utilizando machine learning.
