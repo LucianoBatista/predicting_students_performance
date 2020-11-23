@@ -1,0 +1,18 @@
+---
+title: "Home"
+output: html_document
+---
+
+Como desafio para o processo seletivo de Cientista de Dados da Trybe foi solicitado a resolução de um problema de negócio utilizando machine learning.
+
+A base de dados fornecida vem da da Open University (universidade online do Reino Unido), contemplando informações de mais de 30 mil estudantes.
+
+Na base nós temos 7 diferentes tabelas, contendo informações sobre:
+
+- Cursos
+- Estudantes
+- Plataforma online
+  
+As tabelas estão organizadas segundo o design abaixo:
+
+![design_tables](img/model.png)
