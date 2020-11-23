@@ -6,8 +6,11 @@ Como dito anteriormente, nesta etapa você encontra a análise exploratório de 
 
 # Libs
 
+Abaixo você encontra os pacotes utilizados para desenvolvimento da etapa 1 do desafio.
+
 ```{r}
 library(tidyverse)
+library(skimr)
 library(data.table)
 library(tidytable)
 library(data.table)
@@ -36,46 +39,23 @@ pallete_4 <- c("#014034", "#1AD9B6", "#038C73", "#401200", "#8C2903")
 ```
 
 
-# Data
+# Dados
 
 ```{r}
 # Os datasets utilizados estão separados em 3 categorias
 # Ofertas dos cursos: Provas, Período de oferta e recursos online
-assessments <- read_csv("data/assessments.csv")
-courses <- read_csv("data/courses.csv")
-vle <- read_csv("data/vle.csv")
+assessments <- read_csv("data/assessments.csv") %>% 
+    mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
 
-# Fatores Demográficos
-student_info <- read_csv("data/studentInfo.csv")
-
-# Dados sobre interação dos estudantes com ambiente online
-student_registration <- read_csv("data/studentRegistration.csv")
-student_assessment <- read_csv("data/studentAssessment.csv")
-student_vle <- data.table::fread("data/studentVle.csv") # tabela grande (450mb)
-
-
-```
-
-
-# EDA
-
-## Oferta e Duração dos Cursos
-
-Observou-se que sempre que um curso é ofertado  no **<span style="color:#12A661">primeiro período</span>** do ano ele possui menor carga horária total (em dias), comparado ao **<span style="color:#1495B3">segundo período</span>**.
-
-```{r courses_duration, fig.height=4.5, fig.width=8}
-#class: animated slideInRight fadeOutLeft, center
-
-# convertendo em datas
-courses_v1_tbl <- courses %>% 
-  mutate(presentation_date = case_when(code_presentation == "2013J" ~ "2013/02/01",
-                                       code_presentation == "2013B" ~ "2013/10/01",
-                                       code_presentation == "2014J" ~ "2014/02/01",
-                                       TRUE ~ "2014/10/01"),
-         presentation_date = as.Date(presentation_date, tryFormats = c("%Y/%m/%d")))
-
-# Visualização
-courses_v1_tbl %>% 
+courses <- read_csv("data/courses.csv") %>% 
   mutate(code_module = factor(code_module, 
                               levels = c("AAA", "BBB", 
                                          "CCC", "DDD", 
@@ -84,7 +64,107 @@ courses_v1_tbl %>%
                               labels = c("Curso A", "Curso B", 
                                          "Curso C", "Curso D", 
                                          "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
+                                         "Curso G")))
+
+vle <- read_csv("data/vle.csv") %>% 
+  mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
+
+courses <- read_csv("data/courses.csv") %>% 
+  mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
+
+# Fatores Demográficos
+student_info <- read_csv("data/studentInfo.csv") %>% 
+  mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
+
+# Dados sobre interação dos estudantes com ambiente online
+student_registration <- read_csv("data/studentRegistration.csv") %>% 
+  mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
+
+student_assessment <- read_csv("data/studentAssessment.csv")
+
+student_vle <- data.table::fread("data/studentVle.csv") %>% # tabela grande (450mb)
+  tibble() %>% 
+  mutate(code_module = factor(code_module, 
+                              levels = c("AAA", "BBB", 
+                                         "CCC", "DDD", 
+                                         "EEE", "FFF", 
+                                         "GGG"),
+                              labels = c("Curso A", "Curso B", 
+                                         "Curso C", "Curso D", 
+                                         "Curso E", "Curso F", 
+                                         "Curso G")))
+
+
+```
+
+Referente a feature `code_module` eu já estou aplicando uma alteração para facilitar a visualização dos nomes dos cursos. A alteração foi feita em todos os datasets que contém a variável.
+
+# EDA
+
+Nossa base é bem grande e composta por diversas tabelas com diversas variáveis que podem ser úteis para nosso modelo de previsão. Justamente por isso, é imprescindível que tenhamos um compreendimento de toda a informação presente nos datasets.
+
+Sendo assim, eu resumi os principais aspectos da base de dados e organizei por tópicos para facilitar o entendido.
+
+## Oferta e Duração dos Cursos
+
+Sempre inicio minhas análises olhando de perto como está a saúde dos nossos dados, para isso a função `skimr::skim()` é muito útil.
+
+```{r}
+# convertendo em datas
+courses_v1_tbl <- courses %>% 
+  mutate(presentation_date = case_when(code_presentation == "2013J" ~ "2013/02/01",
+                                       code_presentation == "2013B" ~ "2013/10/01",
+                                       code_presentation == "2014J" ~ "2014/02/01",
+                                       TRUE ~ "2014/10/01"),
+         presentation_date = as.Date(presentation_date, tryFormats = c("%Y/%m/%d")))
+
+skim(courses_v1_tbl)
+
+```
+
+Aqui temos informações sobre os cursos oferecidos na base de dados. São sete no total e foram divididos de A a G. Além disso temos também as data em que cada um é ofertado e sua duração em dias.
+
+Não vemos nenhum valor missing até o momento.
+
+Observamos que alguns cursos são oferecidos em dois períodos diferentes (FEV e AGO), sempre que o mesmo é ofertado em FEV possuem duração maior que quando é ofertado em AGO.
+
+No gráfico o **<span style="color:#12A661">primeiro período</span>** do ano ele possui menor carga horária total (em dias), comparado ao **<span style="color:#1495B3">segundo período</span>**.
+
+```{r courses_duration, fig.height=4.5, fig.width=8}
+# Visualização
+courses_v1_tbl %>% 
   ggplot(aes(x = presentation_date,
              y = module_presentation_length,
              group = code_module,
@@ -109,9 +189,9 @@ courses_v1_tbl %>%
 
 ## Perfomance vs Duração
 
-Mesmo com uma redução considerável na carga horária dos cursos **(30 a 40 dias)**, no geral a performance dos estudantes não sofreu nenhuma mudança significativa. Porém, observamos uma queda de mais de 12% quando olhamos para o **<span style="color:#12A661">Curso B</span>**, no período de 2014/02.
+Para observar se existe relação entre performance e duração do curso precisamos analisar o dataset `assessments`.
 
-```{r score_period, fig.height=4, fig.width=8}
+```{r}
 # convertendo em datas
 assessments_v2_tbl <- assessments %>% 
   mutate(presentation_date = case_when(code_presentation == "2013J" ~ "2013/02/01",
@@ -121,22 +201,73 @@ assessments_v2_tbl <- assessments %>%
          presentation_date = as.Date(presentation_date, tryFormats = c("%Y/%m/%d")),
          assessment_date = presentation_date + date)
 
-# Temos alguns valores nulos nessa tabela que é recorrente 
-# da falta da data do exame final de alguns cursos.
+assessments_v2_tbl %>% skim()
 
-# Na documentação dos dados é dito que a data do exame final, quando NA, 
-# ocorre na última semana do período de duração do curso.
-# Sendo assim vamos utilizar uma segunda tabela para encontrar essa data
+```
 
-# A tabela de curso tem a duração de cada curso
-# realizando um join aqui, é possível obter a data do exame final dos missing values
+Esse dataset é onde estão os dados sobre os testes dos alunos, mais precisamente quando cada avaliação deve ser feita. Temos um total de 8 variáveis no total contendo caracter, data, fator e numérico.
 
+Algumas variáveis nós já conhecemos, mas outras não. 
+
+- id_assessment: apenas o código de identificação de cada avaliação
+- date: data final de entrega do respectivo exame, sendo o presentation_date o dia 0.
+- weight: peso de cada avaliação, em um curso a soma dos tipos de testes tem que dar 100 com exceção do Exam que sozinha conta 100
+- assessment_type: tipo de teste
+  - TMA: Tutor Marked Assessment
+  - CMA: Computer Marked Assessment
+  - EXAM: Final Exam
+  
+Os missing values observados nos dados são explicados na documentação da base de dados. Eles dizem que quando a data do Exame final está faltando é por que ocorreu ao final da última semana de apresentação.
+
+Vamos então utilizar o dataset de `courses` (que contém a duração dos cursos) para encontrar a data dos exames finais e corrigir esses missing values.
+
+```{r}
+# realizando um join, é possível obter a data dos missing values
 assessments_v3_join_tbl <- assessments_v2_tbl %>% 
   left_join(courses, by = c("code_module", "code_presentation")) %>% 
   mutate(assessment_date = case_when(is.na(assessment_date) ~ (presentation_date + module_presentation_length - 6),
                                      TRUE ~ assessment_date),
          code_module = as.factor(code_module))
 
+```
+
+Ainda vamos precisar de mais dois datasets para checar essa relação entre performance e curso. Vamos então checar primeiramnte o `student_assessment`.
+
+```{r}
+skim(student_assessment)
+
+
+```
+
+Esse é um dataset maior que contém informações muito úteis sobre os scores de cada estudante em cada tipo de exame que foi eferecido no semestre, e a data que foi submetido.
+
+Temos também uma variável chamada `is_banked`, que indica quando o aluno reutilizou algum teste anterior.
+
+E a variação das notas vai de 0 a 100.
+
+Todas as variáveis são numéricas e com diferentes níveis de skewness. Além disso temos alguns missings que serão analisados mais a fundo em outras etapas. Vamos agora observar `student_info`. 
+
+```{r}
+skim(student_info)
+
+```
+
+Novamente um dataset maior, com informações demográficas sobre os estudantes:
+- gênero
+- região demográfica
+- educação mais alta
+- imd_band
+- idade (range)
+- vezes que o estudante já tentou o curso
+- número total de créditos do curso que o estudante ta cursando
+- apresenta ou não alguma deficiência
+- final result in the module
+
+Temos ainda a presença de alguns valores missing (1111) na variável imd_band. Que também será analisado em outras etapas.
+
+Mesmo com uma redução considerável na carga horária dos cursos **(30 a 40 dias)**, no geral a performance dos estudantes não sofreu nenhuma mudança significativa. Porém, observamos uma queda de mais de 12% quando olhamos para o **<span style="color:#12A661">Curso B</span>**, no período de 2014/02.
+
+```{r score_period, fig.height=4, fig.width=8}
 # Agora sim, nosso dataset assessments não possui valores missings
 
 # Precisamos agora de algumas informações que estão em outra tabela
@@ -155,15 +286,6 @@ assem_demog_info_v1_tbl %>%
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   group_by(code_presentation, code_module) %>% 
   summarise(avg = mean(score, na.rm = TRUE)) %>%
   ungroup() %>% 
@@ -186,9 +308,9 @@ assem_demog_info_v1_tbl %>%
 
 ## Material de consulta
 
-A OU (Open University) oferece diversos materiais para auxiliar os estudantes. Com o tempo, houve aumento da quantidade de recursos assim como a **<span style="color:#12A661">adição de novos</span>**.
+Aqui precisamos dar uma olhada no dataset `vle`
 
-```{r resource, fig.height=4, fig.width=10}
+```{r}
 # conversão em data
 vle_v1_tbl <- vle %>% 
   mutate(presentation_date = case_when(code_presentation == "2013J" ~ "2013/02/01",
@@ -197,6 +319,18 @@ vle_v1_tbl <- vle %>%
                                        TRUE ~ "2014/10/01"),
          presentation_date = as.Date(presentation_date, tryFormats = c("%Y/%m/%d")))
 
+skim(vle_v1_tbl)
+
+
+```
+
+Aqui temos um registro de todos os materiais disponíveis na plataforma online da OU e também quando determinado material estará disponível. Também temos a presença de muitos valores missing (5243) na variável week_from e week_to.
+
+Como essas variáveis são referentes a semana destinada para se fazer uso do material, acredito que alguns materiais não possuem tão restrição, logo não possuíndo week_from nem week_to.
+
+A OU (Open University) oferece diversos materiais para auxiliar os estudantes. Com o tempo, houve aumento da quantidade de recursos assim como a **<span style="color:#12A661">adição de novos</span>**.
+
+```{r resource, fig.height=4, fig.width=10}
 vle_v2_grouped_tbl <- vle_v1_tbl %>% 
   group_by(code_module, presentation_date, activity_type) %>% 
   summarise(count = n()) %>% 
@@ -259,16 +393,7 @@ vle_v1_tbl %>%
   ungroup() %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
-                                    labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
+                                    labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) %>%
   ggplot(aes(x = code_presentation,
              y = count)) +
   geom_segment( aes(x = code_presentation, xend = code_presentation, y=0, yend = count), color="grey") +
@@ -297,15 +422,6 @@ Cada curso possui avaliações intermediárias **<span style="color:#12A661">(TM
 ```{r period_tests, fig.height=4, fig.width=10}
 # Período de avaliações
 assessments_v3_join_tbl %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   ggplot(aes(x = assessment_date,
              y = fct_rev(code_module),
              fill = assessment_type)) +
@@ -352,15 +468,6 @@ student_prop_2 <- student_info %>%
 student_fail_ratio <- bind_cols(student_prop, student_prop_2) %>% 
   mutate(prop = count_2/count) %>% 
   select(code_presentation, code_module, prop) %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
@@ -419,15 +526,6 @@ student_prop_3 <- student_info %>%
 student_withdrawn_ratio <- bind_cols(student_prop, student_prop_3) %>% 
   mutate(prop = count_2/count) %>% 
   select(code_presentation, code_module, prop) %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
@@ -475,15 +573,6 @@ student_prop_4 <- student_info %>%
 student_pass_ratio <- bind_cols(student_prop, student_prop_4) %>% 
   mutate(prop = count_2/count) %>% 
   select(code_presentation, code_module, prop) %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) 
@@ -522,15 +611,6 @@ Os dados mostram uma população predominantemente feminina em 2 cursos específ
 ```{r, echo=FALSE, fig.height=4, fig.width=10}
 # quantidade de estudantes por sexo
 student_prop_gender <- student_info %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) %>%
@@ -570,15 +650,6 @@ student_prop_gender %>%
 # perfil de destribuição dos scores
 
 assem_demog_info_v1_fct_tbl <- assem_demog_info_v1_tbl %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
@@ -609,17 +680,7 @@ Também é possível notar que todos os cursos mantém um perfil característico
 
 ```{r, fig.height=4, fig.width=10}
 # perfil de destribuição dos scores
-
 assem_demog_info_v1_fct_tbl <- assem_demog_info_v1_tbl %>% 
-  mutate(code_module = factor(code_module, 
-                              levels = c("AAA", "BBB", 
-                                         "CCC", "DDD", 
-                                         "EEE", "FFF", 
-                                         "GGG"),
-                              labels = c("Curso A", "Curso B", 
-                                         "Curso C", "Curso D", 
-                                         "Curso E", "Curso F", 
-                                         "Curso G"))) %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
                                     labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
@@ -646,6 +707,10 @@ assem_demog_info_v1_fct_tbl %>%
 
 
 ## Distribuição da Taxa de Acesso à Plataforma
+
+Aqui nós precisamos da uma olhada numa base que ainda não havia sido trabalhada, a `student_vle`. Esse dataset contém mais de 10M de observações de registro de cada estudante na plataforma online, onde foi registrado a quantidade de clicks e a data.
+
+A data aqui está registrada em dias, sendo dia 0 o dia de início do curso e dias negativos dias anteriores ao início do curso.
 
 Como a plataforma online da OU oferece grande quantidade de materiais, e toda interação online é registrada no banco de dados, pode ser útil observar se existe diferença entre os estudantes de **alto desempenho** (High), apresentado no gráfico abaixo, e os demais.
 
@@ -886,16 +951,7 @@ prop_period_join <- function (ratio_high_fct) {
     ungroup() %>% 
     mutate(code_presentation.y = factor(code_presentation.y, 
                                       levels = c("2013J", "2013B", "2014J", "2014B"),
-                                      labels = c("2013/02", "2013/10", "2014/02", "2014/10"))) %>% 
-    mutate(code_module = factor(code_module, 
-                                levels = c("AAA", "BBB", 
-                                           "CCC", "DDD", 
-                                           "EEE", "FFF", 
-                                           "GGG"),
-                                labels = c("Curso A", "Curso B", 
-                                           "Curso C", "Curso D", 
-                                           "Curso E", "Curso F", 
-                                           "Curso G")))
+                                      labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
   
   
 }
@@ -1047,9 +1103,6 @@ interactive_plot_ageband <- assem_demog_info_v3_tbl %>%
 plot_map_by_category(var = age_band) %>%
   plotly::ggplotly(tooltip = "text", width=500, height=300) %>%
   style(hoveron = "text")
-
-htmltools::save_html(interactive_plot_gender, file = "interactive_plot_gender.html")
-htmltools::save_html(interactive_plot_ageband, file = "interactive_plot_ageband.html")
 
 ```
 
