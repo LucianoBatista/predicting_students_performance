@@ -1,0 +1,13 @@
+name: "gol_data_scientist_case"
+output_dir: "docs"
+navbar:
+  title: "Home"
+  left:
+  - text: "Home"
+    href: index.html
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    code_folding: hide
+    warning: FALSE
