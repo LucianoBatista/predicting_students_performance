@@ -5,9 +5,11 @@ navbar:
   left:
   - text: "Home"
     href: index.html
+  - text: "Etapa 1"
+    href: etapa1_eda.html
 output:
   html_document:
-    theme: flatly
+    theme: cosmo
     highlight: tango
     code_folding: hide
     warning: FALSE

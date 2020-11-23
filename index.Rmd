@@ -1,5 +1,5 @@
 ---
-title: "Home"
+title: "Instruções"
 ---
 
 Como desafio para o processo seletivo de Cientista de Dados da Trybe foi solicitado a resolução de um problema de negócio utilizando machine learning.
@@ -14,4 +14,22 @@ Na base nós temos 7 diferentes tabelas, contendo informações sobre:
   
 As tabelas estão organizadas segundo o design abaixo:
 
-![design_tables](img/model.png)
+![Figura 1: Design das tabelas no banco de dados](img/model.png)
+
+A escolha de qual problema responder fica por conta do candidato, mas foram dadas duas opções:
+
+1. Quais são os diferentes perfis de estudantes? Quais características definem esses grupos?
+1. Como predizer o desempenho dos estudantes nas avaliações finais?
+
+Seguirei então com a resolução da **segunda questão**. Outro requerimento do desafio foi dividir a análise em etapas, sendo assim, você pode encontrar cada etapa na parte superior da página, contendo:
+
+- Etapa 1: Análise Exploratória dos Dados
+- Etapa 2 e 3: Modelagem 
+  - Como predizer o desempenho dos estudantes nas avaliações finais?
+  - Crie o modelo e avalie sua qualidade e precisão
+- Etapa 4: Conclusões finais
+  - Quais são as principais características da base de dados?
+  - Qual foi o problema de negócio escolhido?
+  - Qual foi o modelo utilizado e qual o motivo da escolha? Outros testados?
+  - Como você avalia os resultados obtidos?
+  
