@@ -1,12 +1,19 @@
 ---
-title: "Etapa 1"
+title: "Etapa 1: EDA"
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, dpi = 300, fig.align = "center", fig.width = 10, fig.height = 7)
+
+```
+
+
 Como dito anteriormente, nesta etapa você encontra a análise exploratório de dados (EDA).
+<p style="margin-bottom:40px"></p>
 
 # Libs
 
-Abaixo você encontra os pacotes utilizados para desenvolvimento da etapa 1 do desafio.
+Abaixo está os pacotes utilizados para desenvolvimento da etapa 1 do desafio.
 
 ```{r}
 library(tidyverse)
@@ -24,11 +31,9 @@ library(plotly)
 
 ```
 
-Paleta de cores utilizadas na análise
+Paleta de cores utilizadas ao longo da análise
 
 ```{r}
-# Paleta de cores utilizadas ao longo da análise 
-
 pallete_disc <- c("#12A661", "#1495B3", "#A67B24", "#482159", 
              "#D90D5B", "#165914", "#A61F0C", "#243B40", 
              "#165F66", "#1CA62D", "#A6341B")
@@ -37,13 +42,13 @@ pallete_3 <- c("#D91A25", "#8C0A11", "#038C73", "#D9831A", "#8C520A")
 pallete_4 <- c("#014034", "#1AD9B6", "#038C73", "#401200", "#8C2903")
 
 ```
-
+<p style="margin-bottom:40px"></p>
 
 # Dados
 
+Leitura de todas as tabelas disponíveis na base de dados.
+
 ```{r}
-# Os datasets utilizados estão separados em 3 categorias
-# Ofertas dos cursos: Provas, Período de oferta e recursos online
 assessments <- read_csv("data/assessments.csv") %>% 
     mutate(code_module = factor(code_module, 
                               levels = c("AAA", "BBB", 
@@ -129,17 +134,21 @@ student_vle <- data.table::fread("data/studentVle.csv") %>% # tabela grande (450
 
 ```
 
-Referente a feature `code_module` eu já estou aplicando uma alteração para facilitar a visualização dos nomes dos cursos. A alteração foi feita em todos os datasets que contém a variável.
+Nosso dataset possui uma variável chamada `code_module` que contém os códigos dos cursos, como não é tão apresentável eu alterei apenas os labels para nomes mais explicativos. Os labels foram alterados em todos os datasets.
+<p style="margin-bottom:40px"></p>
 
 # EDA
 
-Nossa base é bem grande e composta por diversas tabelas com diversas variáveis que podem ser úteis para nosso modelo de previsão. Justamente por isso, é imprescindível que tenhamos um compreendimento de toda a informação presente nos datasets.
+Nossa base é bem grande e é composta por diversas tabelas com diversas variáveis que podem ser úteis para nosso modelo de previsão de performance dos estudantes. Justamente por isso, é imprescindível que tenhamos um compreendimento de toda a informação disponível.
 
 Sendo assim, eu resumi os principais aspectos da base de dados e organizei por tópicos para facilitar o entendido.
 
+Sempre inicio minhas análises olhando de perto como está a saúde dos nossos dados, para isso a função `skimr::skim()` é muito útil. Em cada seção que o dataset for utilizado pela primeira vez uma breve descrição será feita seguido por algum insight observado.
+<p style="margin-bottom:40px"></p>
+
 ## Oferta e Duração dos Cursos
 
-Sempre inicio minhas análises olhando de perto como está a saúde dos nossos dados, para isso a função `skimr::skim()` é muito útil.
+Nosso primeiro dataset será `courses`:
 
 ```{r}
 # convertendo em datas
@@ -154,13 +163,11 @@ skim(courses_v1_tbl)
 
 ```
 
-Aqui temos informações sobre os cursos oferecidos na base de dados. São sete no total e foram divididos de A a G. Além disso temos também as data em que cada um é ofertado e sua duração em dias.
+Neste dataset temos informações sobre os cursos oferecidos na base de dados. São sete no total e foram divididos de A a G, além disso temos também as data em que cada um deles passa a ser ofertado e sua duração em dias.
 
-Não vemos nenhum valor missing até o momento.
+Não foi detectado nenhum missing value até o momento. 
 
-Observamos que alguns cursos são oferecidos em dois períodos diferentes (FEV e AGO), sempre que o mesmo é ofertado em FEV possuem duração maior que quando é ofertado em AGO.
-
-No gráfico o **<span style="color:#12A661">primeiro período</span>** do ano ele possui menor carga horária total (em dias), comparado ao **<span style="color:#1495B3">segundo período</span>**.
+Observamos que alguns cursos são oferecidos em dois períodos diferentes (FEV e AGO) e sempre que o mesmo é ofertado em FEV possue duração maior que quando é ofertado em AGO.
 
 ```{r courses_duration, fig.height=4.5, fig.width=8}
 # Visualização
@@ -186,10 +193,12 @@ courses_v1_tbl %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
+No gráfico acima o **<span style="color:#12A661">primeiro período</span>** do ano possui menor carga horária total (em dias), comparado ao **<span style="color:#1495B3">segundo período</span>**.
+<p style="margin-bottom:40px"></p>
 
 ## Perfomance vs Duração
 
-Para observar se existe relação entre performance e duração do curso precisamos analisar o dataset `assessments`.
+Visto que o mesmo curso pode ser ofertado por períodos mais longos e mais curtos, pode ser interessante investigar se tal fator provoca alguma consequência nas notas dos estudantes. Para observar se existe relação entre performance e duração do curso precisamos analisar o dataset `assessments`.
 
 ```{r}
 # convertendo em datas
@@ -205,19 +214,19 @@ assessments_v2_tbl %>% skim()
 
 ```
 
-Esse dataset é onde estão os dados sobre os testes dos alunos, mais precisamente quando cada avaliação deve ser feita. Temos um total de 8 variáveis no total contendo caracter, data, fator e numérico.
+Esse dataset é onde estão os dados sobre as avaliações dos alunos, mais precisamente quando cada avaliação deve ser feita. Temos um total de 8 variáveis e quatro diferentes tipos: categórica, data, fator e numérico.
 
-Algumas variáveis nós já conhecemos, mas outras não. 
+Algumas variáveis nós já conhecemos, mas outras não, como por exemplo:
 
-- id_assessment: apenas o código de identificação de cada avaliação
-- date: data final de entrega do respectivo exame, sendo o presentation_date o dia 0.
-- weight: peso de cada avaliação, em um curso a soma dos tipos de testes tem que dar 100 com exceção do Exam que sozinha conta 100
-- assessment_type: tipo de teste
-  - TMA: Tutor Marked Assessment
-  - CMA: Computer Marked Assessment
-  - EXAM: Final Exam
+- **id_assessment:** código de identificação de cada avaliação.
+- **date:** data final de entrega do respectivo exame, sendo o `presentation_date` o dia 0.
+- **weight:** peso de cada avaliação, em um curso a soma dos tipos de testes tem que dar 100 com exceção do Exam que sozinho conta 100.
+- **assessment_type:** tipo de teste
+  - *TMA:* Tutor Marked Assessment (avaliação assistida pelo tutor)
+  - *CMA:* Computer Marked Assessment (avaliação assistida por computador)
+  - *EXAM:* Final Exam (exame final)
   
-Os missing values observados nos dados são explicados na documentação da base de dados. Eles dizem que quando a data do Exame final está faltando é por que ocorreu ao final da última semana de apresentação.
+Os missing values observados nos dados são explicados na documentação da base de dados da OU. Eles dizem que quando a data do Exame final está faltando é por que ocorreu ao final da última semana de apresentação.
 
 Vamos então utilizar o dataset de `courses` (que contém a duração dos cursos) para encontrar a data dos exames finais e corrigir esses missing values.
 
@@ -231,46 +240,41 @@ assessments_v3_join_tbl <- assessments_v2_tbl %>%
 
 ```
 
-Ainda vamos precisar de mais dois datasets para checar essa relação entre performance e curso. Vamos então checar primeiramnte o `student_assessment`.
+Ainda no intuito de relacionar performance e duração dos cursos precisamos checar mais dois datasets, o `student_assessment` e o `student_info`.
 
 ```{r}
 skim(student_assessment)
 
-
 ```
 
-Esse é um dataset maior que contém informações muito úteis sobre os scores de cada estudante em cada tipo de exame que foi eferecido no semestre, e a data que foi submetido.
+Esse é um dataset maior que contém informações muito úteis sobre os scores de cada estudante em cada tipo de avaliação que foi realizada no semestre, e a data em que foi submetido.
 
-Temos também uma variável chamada `is_banked`, que indica quando o aluno reutilizou algum teste anterior.
+Temos também uma variável chamada `is_banked`, que indica quando o aluno reutilizou algum teste anterior. Além disso, a variação das notas vai de 0 a 100, sendo as menores de 40 indicadas como reprovação (*fail*).
 
-E a variação das notas vai de 0 a 100.
-
-Todas as variáveis são numéricas e com diferentes níveis de skewness. Além disso temos alguns missings que serão analisados mais a fundo em outras etapas. Vamos agora observar `student_info`. 
+Todas as variáveis são numéricas e com diferentes níveis de skewness. Além disso temos alguns missing values que serão analisados mais a fundo em outras etapas. Vamos agora observar `student_info`. 
 
 ```{r}
 skim(student_info)
 
 ```
 
-Novamente um dataset maior, com informações demográficas sobre os estudantes:
-- gênero
-- região demográfica
-- educação mais alta
-- imd_band
-- idade (range)
-- vezes que o estudante já tentou o curso
-- número total de créditos do curso que o estudante ta cursando
-- apresenta ou não alguma deficiência
-- final result in the module
+Novamente um dataset maior, com informações mais específicas sobre os estudantes:
 
-Temos ainda a presença de alguns valores missing (1111) na variável imd_band. Que também será analisado em outras etapas.
+- gender: gênero
+- region: região demográfica
+- highest_education: grau de educação mais alto
+- imd_band: parâmetro qualitativo dado a localidade de moradia do estudante, quanto menor o valor mais carente é o local.
+- age_band: faixa etária
+- num_of_prev_attempts: número de vezes que o estudante já tentou o curso
+- studied_credits: número total de créditos do curso que o estudante está cursando
+- disability: apresenta ou não alguma deficiência
+- final_result: se foi aprovado ou não
 
-Mesmo com uma redução considerável na carga horária dos cursos **(30 a 40 dias)**, no geral a performance dos estudantes não sofreu nenhuma mudança significativa. Porém, observamos uma queda de mais de 12% quando olhamos para o **<span style="color:#12A661">Curso B</span>**, no período de 2014/02.
+Temos ainda a presença de alguns valores missing (1111) na variável imd_band. Que também serão analisados em outras etapas.
+
+Juntando os datasets vistos até aqui nesta seção, podemos criar o seguinte gráfico:
 
 ```{r score_period, fig.height=4, fig.width=8}
-# Agora sim, nosso dataset assessments não possui valores missings
-
-# Precisamos agora de algumas informações que estão em outra tabela
 # Para isso, faremos um join
 assem_demog_info_tbl <- student_assessment %>% 
   left_join(student_info, by = "id_student") %>%
@@ -305,10 +309,12 @@ assem_demog_info_v1_tbl %>%
 
 ```
 
+Vemos que mesmo com uma redução considerável na carga horária dos cursos **(30 a 40 dias)** quando ofertados em diferentes períodos, no geral a performance dos estudantes não sofreu nenhuma mudança significativa. Porém, observamos uma queda de mais de 12% quando olhamos para o **<span style="color:#12A661">Curso B</span>**, no período de 2014/02.
+<p style="margin-bottom:40px"></p>
 
 ## Material de consulta
 
-Aqui precisamos dar uma olhada no dataset `vle`
+Mudando um pouco o foco, vamos analisar o dataset que contêm algumas informações sobre a plataforma online da OU, o `vle`.
 
 ```{r}
 # conversão em data
@@ -324,11 +330,9 @@ skim(vle_v1_tbl)
 
 ```
 
-Aqui temos um registro de todos os materiais disponíveis na plataforma online da OU e também quando determinado material estará disponível. Também temos a presença de muitos valores missing (5243) na variável week_from e week_to.
+Aqui temos um registro de todos os materiais disponíveis na plataforma online da OU e também o período indicado para utilização do material. Também temos a presença de muitos valores missing (5243) na variável week_from e week_to.
 
-Como essas variáveis são referentes a semana destinada para se fazer uso do material, acredito que alguns materiais não possuem tão restrição, logo não possuíndo week_from nem week_to.
-
-A OU (Open University) oferece diversos materiais para auxiliar os estudantes. Com o tempo, houve aumento da quantidade de recursos assim como a **<span style="color:#12A661">adição de novos</span>**.
+Como essas variáveis são referentes a semana destinada para se fazer uso do material, acredito que alguns materiais não possuem tal restrição, logo não possuíndo week_from nem week_to.
 
 ```{r resource, fig.height=4, fig.width=10}
 vle_v2_grouped_tbl <- vle_v1_tbl %>% 
@@ -369,6 +373,8 @@ inter %>%
 
 ```
 
+A partir do gráfico acima vemos que a OU (Open University) oferece diversos materiais para auxiliar seus estudantes. Além disso, com o passar do tempo, houve aumento da quantidade de material em recursos já disponíveis, assim como a **<span style="color:#12A661">adição de novos</span>**.
+<p style="margin-bottom:40px"></p>
 
 ## Material de consulta
 
@@ -378,14 +384,9 @@ tot_material_2013 <- tot_material[1]
 tot_material_2014 <- tot_material[2]
 ```
 
-
 Apesar do aumento na quantidade total de materiais ofertados ao longo do tempo: **`r tot_material_2013`** em 2013 e **`r tot_material_2014`** em 2014, esse comportamento não é linear quando analisamos curso a curso. E curiosamente, no curso B, no mesmo período que houve menos oferta de material **<span style="color:#12A661">(mais de 100 recursos a menos)</span>**, é o período que observamos uma queda na média do score final dos estudantes.
 
 ```{r resource_class, fig.height=4, fig.width=10}
-tot_material <- inter %>% group_by(year) %>% summarise(tot = sum(count)) %>% pull(tot)
-tot_material_2013 <- tot_material[1] 
-tot_material_2014 <- tot_material[2]
-
 # todo material disponível no ambiente online (virtual learning environment)
 vle_v1_tbl %>%
   group_by(code_presentation, code_module) %>% 
@@ -413,11 +414,14 @@ vle_v1_tbl %>%
 
 
 ```
+<p style="margin-bottom:40px"></p>
 
 
 ## Período das Avaliações
 
-Cada curso possui avaliações intermediárias **<span style="color:#12A661">(TMA)</span>** ao longo do período e avaliações finais **<span style="color:#8F1F17">(Exam)</span>** na última semana. Porém, um tipo de avaliação **<span style="color:#A67B24">(CMA)</span>** não ocorre para todas as disciplinas e nem em todos períodos. Por ser uma avaliação assistida por computador, presume-se que não se aplica a todos os cursos.
+Como nós já vimos nos datasets anteriores, cada curso possui um conjunto de avaliações que se alternam em três diferentes tipos. Temos as intermediárias **<span style="color:#12A661">(TMA)</span>** e **<span style="color:#A67B24">(CMA)</span>** ao longo do período do curso e avaliações finais **<span style="color:#8F1F17">(Exam)</span>** na última semana. Porém, o CMA ocorre para todas as disciplinas e nem em todos períodos. Por ser uma avaliação assistida por computador, presume-se que não se aplica a todos os cursos, mas não temos mais informações para testar essa hipótese.
+
+Abaixo nós podemos visualizar quando que cada avaliação é realizada por curso e por período.
 
 ```{r period_tests, fig.height=4, fig.width=10}
 # Período de avaliações
@@ -438,14 +442,22 @@ assessments_v3_join_tbl %>%
   theme(panel.grid.major.x = element_blank()) 
 
 ```
-
-
-## Estudantes
+<p style="margin-bottom:40px"></p>
 
 
 ## Taxa de Reprovação
 
-Aqui observa-se um padrão interessante em relação a taxa de reprovação nos cursos. Apesar de vermos que a média de performance permanece praticamente sem alteração ao longo dos períodos (slide 5), a **taxa de reprovação** costuma ser um pouco **<span style="color:#12A661">maior</span>** nos períodos mais curtos (considerando os cursos que foram ofertados mais de 3 vezes).
+Nesta seção e nas próximas iremos analisar a performance dos estudantes, buscando relacionar com alguns outras features. 
+
+Primeiro ponto será analisar a taxa de reprovação dos estudantes, a qual foi calculada da seguinte forma:
+
+<p style="margin-bottom:40px"></p>
+<center>
+$taxa_{reprovação} = \frac{estudantes\space reprovados}{total\space de\space estudantes}$
+</center>
+<p style="margin-bottom:40px"></p>
+
+Dessa forma, nós temos para cada período e curso um fator que pode ser comparado, o qual vamos visualizar no gráfico abaixo.
 
 ```{r fail_ratio, fig.height=4, fig.width=7}
 # taxa de reprovação
@@ -507,10 +519,18 @@ student_fail_ratio %>%
 
 ```
 
+O que vemos é que apesar da média de performance permanecer praticamente sem alteração ao longo dos períodos (seções anteriores), a **taxa de reprovação** costuma ser um pouco **<span style="color:#12A661">maior</span>** nos períodos mais curtos (*considerando os cursos que foram ofertados mais de 3 vezes*).
+<p style="margin-bottom:40px"></p>
+
 
 ## Taxas de Desistência e Aprovação
 
-Analisando as taxas de desitência e aprovação é observado que os cursos **<span style="color:#12A661">A e G</span>** apresentam as menores taxas de desistência. Além disso, o curso **<span style="color:#12A661">Curso A</span>** apresenta a maior taxa de aprovação, aproximadamente 7 a cada 10 estudantes são aprovados.
+Aqui a taxa calculada foi a desistência de forma bem semelhante a anterior:
+<p style="margin-bottom:40px"></p>
+<center>
+$taxa_{reprovação} = \frac{estudantes\space desistentes}{total\space de\space estudantes}$
+</center>
+<p style="margin-bottom:40px"></p>
 
 ```{r withdrawn_ratio, fig.height=6, fig.width=8}
 # taxa de desistência
@@ -559,6 +579,18 @@ student_withdrawn_ratio %>%
 
 ```
 
+Analisando a taxa de desitência foi observado que os cursos **<span style="color:#12A661">A e G</span>** apresentam as menores taxas de desistência. 
+<p style="margin-bottom:40px"></p>
+
+## Taxa de Aprovação
+
+Aqui a taxa calculada foi a aprovação de forma bem semelhante as anteriores:
+<p style="margin-bottom:40px"></p>
+<center>
+$$taxa_{reprovação} = \frac{estudantes\space aprovados}{total\space de\space estudantes}$$
+</center>
+<p style="margin-bottom:40px"></p>
+
 ```{r pass_ratio, fig.height=6, fig.width=8}
 # taxa de aprovados
 student_prop_4 <- student_info %>%   
@@ -604,9 +636,12 @@ student_pass_ratio %>%
 
 ```
 
+Analisando a taxas de aprovação foi observado que o curso **<span style="color:#12A661">Curso A</span>** apresenta a maior valor, aproximadamente 7 a cada 10 estudantes são aprovados.
+<p style="margin-bottom:40px"></p>
+
 ## Quantidade de Estudantes por Gênero
 
-Os dados mostram uma população predominantemente feminina em 2 cursos específicos: **Curso B e Curso G**. Em todas os outros temos mais homens participando dos cursos. Tal aderência pode ter relação com características intrínsecas dos respectivos cursos.
+Entre homens e mulheres presentes na nossa base, vale a pena analisar como essa feature está relacionada aos cursos.
 
 ```{r, echo=FALSE, fig.height=4, fig.width=10}
 # quantidade de estudantes por sexo
@@ -640,15 +675,15 @@ student_prop_gender %>%
 
 ```
 
+Os dados mostram uma população predominantemente feminina em 2 cursos específicos: **Curso B e Curso G**. Em todas os outros temos mais homens participando dos cursos. Tal aderência pode ter relação com características intrínsecas dos respectivos cursos e infelizmente não temos dados para testar essa hipótese.
+<p style="margin-bottom:40px"></p>
+
 ## Distribuições dos Scores Finais
 
-.left[Após ter visualizado no slide 5 a média dos scores finais, é interessante observar como foi a distribuição de notas ao longo do tempo e por curso.]
-
-.left[O que observa-se é um comportamento diferenciado em 2 cursos (**<span style="color:#12A661">Curso B e Curso G</span>**). Ambos possuem um pico de estudantes com performance muito elevada **(acima de 90 pontos)**.]
+Até o momento nós apenas visualizamos as notas finais e não a distribuição de notas ao longo do tempo e por curso. Vamos então analisar o gráfico abaixo:
 
 ```{r, fig.height=4, fig.width=10}
 # perfil de destribuição dos scores
-
 assem_demog_info_v1_fct_tbl <- assem_demog_info_v1_tbl %>% 
   mutate(code_presentation = factor(code_presentation, 
                                     levels = c("2013J", "2013B", "2014J", "2014B"),
@@ -674,56 +709,39 @@ assem_demog_info_v1_fct_tbl %>%
 
 ```
 
-## Distribuições dos Scores Finais
+O que observa-se é um comportamento diferenciado em 2 cursos (**<span style="color:#12A661">Curso B e Curso G</span>**). Ambos possuem um pico de estudantes com performance muito elevada **(acima de 90 pontos)**. 
 
 Também é possível notar que todos os cursos mantém um perfil característico de distribuição dos scores ao longo do tempo. Tal fator nos leva a acreditar que existe uma manuntenção da forma como os cursos vem sendo trabalhados e também uma manuntenção do perfil de aluno que normalmente opta por cada curso.
-
-```{r, fig.height=4, fig.width=10}
-# perfil de destribuição dos scores
-assem_demog_info_v1_fct_tbl <- assem_demog_info_v1_tbl %>% 
-  mutate(code_presentation = factor(code_presentation, 
-                                    levels = c("2013J", "2013B", "2014J", "2014B"),
-                                    labels = c("2013/02", "2013/10", "2014/02", "2014/10")))
-
-assem_demog_info_v1_fct_tbl %>% 
-  ggplot(aes(x = score,
-             y = fct_rev(code_presentation),
-             fill = stat(x))) + 
-  geom_density_ridges_gradient(gradient_lwd = 1., size = .2) +
-  facet_wrap(~code_module) +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_fill_gradient(high = "#18593B", low = "#12A661") +
-  theme_minimal() +
-  theme(panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  labs(
-    x = "Scores",
-    y = "Data de Oferta dos Cursos"
-  ) +
-  guides(fill = FALSE)
-
-```
-
+<p style="margin-bottom:40px"></p>
 
 ## Distribuição da Taxa de Acesso à Plataforma
 
-Aqui nós precisamos da uma olhada numa base que ainda não havia sido trabalhada, a `student_vle`. Esse dataset contém mais de 10M de observações de registro de cada estudante na plataforma online, onde foi registrado a quantidade de clicks e a data.
+Aqui nós iremos analisar uma base que ainda não havia sido trabalhada nesta EDA, a `student_vle`. Esse dataset contém mais de 10M de observações de registro de cada estudante na plataforma online, onde foi registrado a quantidade de clicks e a data.
 
-A data aqui está registrada em dias, sendo dia 0 o dia de início do curso e dias negativos dias anteriores ao início do curso.
+A data aqui está registrada em dias, sendo *dia 0* o dia de início do curso e *dias negativos* dias anteriores ao início do curso.
 
-Como a plataforma online da OU oferece grande quantidade de materiais, e toda interação online é registrada no banco de dados, pode ser útil observar se existe diferença entre os estudantes de **alto desempenho** (High), apresentado no gráfico abaixo, e os demais.
+Como vimos anteriormente, existem alunos que possuem alta performance (score alto), como também estudantes que tem notas mais inferiores. Vamos então identificar se existe alguma relação entre as notas dos estudantes e o perfil de acesso a plataforma.
 
+Para ser possível de comparação, precisamos de taxas de acesso a plataforma e também categorizar os estudantes entre alta perfomance, performance mediana e baixa performance.
+
+- alta performance: score acima de 90
+- performance mediana: score entre 50 e 90
+- baixa performance: score abaixo de 50
+
+E as taxas foram calculadas assim:
+
+1. identificação da quantidade de clicks dos estudantes (high, med, low).
+1. soma da quantidade de cliques por curso e estudante.
+1. soma do total de estudantes por curso e período.
+1. divisão do item 2 pelo total de estudantes do periodo e curso correspondente.
+
+Sendo assim, para os estudantes de alta performance temos:
 
 ```{r, fig.height=4.5, fig.width=11}
 clicks_students_period <- student_vle %>% 
   group_by(code_presentation, id_student) %>% 
   summarise(clicks = sum(sum_click)) %>% 
   ungroup()
-
-# data about the highest scores students
-# Este procedimento usa muita memória, então eu salvei o csv final
-# resultado desse procedimento.
 
 prop_join <- function(high_score_students) {
 
@@ -757,17 +775,14 @@ prop_join <- function(high_score_students) {
 
 # high_score_students
 high_score_students <- assem_demog_info_v1_tbl %>%
-  distinct(id_student, .keep_all = TRUE) %>% 
   filter(score > 90)
 
 # median_score_students
 median_score_students <- assem_demog_info_v1_tbl %>%
-  distinct(id_student, .keep_all = TRUE) %>% 
   filter(between(score, 50, 90))
 
 # low_score_students
 low_score_students <- assem_demog_info_v1_tbl %>%
-  distinct(id_student, .keep_all = TRUE) %>% 
   filter(between(score, 0, 50))
 
 
@@ -807,9 +822,7 @@ ratio_high_fct %>%
 ```
 
 
-## Distribuição da Taxa de Acesso à Plataforma
-
-Abaixo estão as distribuições do acessso de estudantes que tiveram **scores entre 50 e 90** (Medium). Observando o eixo da taxa de acesso à plataforma, vemos que a mesma é muito baixa quando comparada com os estudantes de alto desempenho.
+Abaixo estão as distribuições do acessso de estudantes que tiveram **scores entre 50 e 90** (Medium).
 
 ```{r, fig.height=4.5, fig.width=11}
 ratio_medium_fct %>% 
@@ -827,9 +840,7 @@ ratio_medium_fct %>%
   )
 ```
 
-## Distribuição da Taxa de Acesso à Plataforma
-
-Abaixo estão os estudantes que foram reprovados, pois tiveram um **score menor que 50** (Low). Observa-se que mesmo sendo reprovados eles obtiveram uma taxa de acesso não tão distante dos estudantes de alto desempenho. O que leva acreditar que sua reprovação pode ser consequência de um outro fator.
+E abaixo estão os estudantes que foram bem mal nas avaliações, tiveram um **score menor que 50** (Low).
 
 ```{r, fig.height=4.5, fig.width=11}
 ratio_low_fct %>% 
@@ -848,10 +859,19 @@ ratio_low_fct %>%
 
 ```
 
+Em resumo das três distribuições vistas acima, temos que:
+
+- todas as distribuições possuem skewness positivo
+- as distribuições dos estudantes de alta performance apresentam maior taxa de acesso à plataforma.
+- as distribuições dos estudantes de performance mediana apresentam também taxa de acesso à plataforma mediana.
+- as distribuições dos estudantes de performance baixa apresentam a mais baixa taxa de acesso à plataforma.
+
+Todas essas observações foram retiradas apenas pelo visual, mas a seguir vamos verificar a variação da média da taxa de acesso à plataforma.
+<p style="margin-bottom:40px"></p>
 
 ## Média da Taxa de Acesso à Plataforma
 
-Após ter uma visão geral do comportamento do acesso à plataforma entre diferentes perfis de estudantes, fica claro ao ver as médias que quem mais acessa os recursos oferecidos pela OU são os estudantes de alto desempenho. Também é possível ver que nos períodos de menor carga horária tem-se um aumento na taxa de acesso.
+Após ter uma visão geral do comportamento do acesso à plataforma entre diferentes perfis de estudantes, fica claro ao ver as médias que quem mais acessa os recursos oferecidos pela OU são os estudantes de alto desempenho. 
 
 ```{r, fig.height=4, fig.width=8}
 # tabela com stats descritivas
@@ -909,10 +929,10 @@ desc_stats %>%
 
 ```
 
+Vale a ressalva que apenas o período de 2013/10 apresentou uma inversão entre o acesso a plataforma dos alunos de notas medianas e os de alta performance. Também é possível ver que nos períodos de menor carga horária tem-se um aumento na taxa de acesso, um hipótese seria que os estudantes precisam utilizar com mais afinco materiais fornecidos pela OU quando possuem menos tempo para estudar por outros recursos.
 
 ```{r, include=FALSE}
 # boxplots
-
 ratio_high %>% 
   ggplot(aes(x = prop,  y = code_presentation.y)) +
   geom_boxplot()
@@ -926,6 +946,7 @@ ratio_low %>%
   geom_boxplot()
 
 ```
+<p style="margin-bottom:40px"></p>
 
 ## Perfil dos Acessos à Plataforma
 
@@ -989,14 +1010,8 @@ g1
 
 ```
 
-## Perfil dos Acessos à Plataforma
-
 Veja que a **<span style="color:#12A661">linha de tendência</span>**  apresenta diferentes picos durante um determinado período. Esses picos são referentes aos períodos das avaliações, sugerindo que os estudantes acessam mais os recursos quando se aproxima das datas das avaliações.
-
-```{r, fig.height=4.5, fig.width=11}
-g1
-```
-
+<p style="margin-bottom:40px"></p>
 
 ## Características por Região
 
@@ -1099,13 +1114,17 @@ plot_map_by_category(var = gender) %>%
   plotly::ggplotly(tooltip = "text", width=500, height=300) %>%
   style(hoveron = "text")
 
+interactive_plot_gender
+
 interactive_plot_ageband <- assem_demog_info_v3_tbl %>%
 plot_map_by_category(var = age_band) %>%
   plotly::ggplotly(tooltip = "text", width=500, height=300) %>%
   style(hoveron = "text")
 
-```
+interactive_plot_ageband 
 
+```
+<p style="margin-bottom:40px"></p>
 
 ## Auxiliando na Tomada de Decisão!
 
@@ -1114,7 +1133,7 @@ plot_map_by_category(var = age_band) %>%
 - Alguns cursos precisam ser estudadas em mais detalhes: 
   - Cursos B e G: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos. 
   - Curso A: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar para outros cursos.]
-
+<p style="margin-bottom:40px"></p>
 
 ## Auxiliando na Tomada de Decisão!
 
