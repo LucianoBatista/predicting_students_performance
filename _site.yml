@@ -7,6 +7,8 @@ navbar:
     href: index.html
   - text: "Etapa 1"
     href: etapa1_eda.html
+  - text: "Etapa 2 e 3"
+    href: etapa2_3.html
 output:
   html_document:
     theme: cosmo
