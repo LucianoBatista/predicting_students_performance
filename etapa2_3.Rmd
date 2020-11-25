@@ -2,11 +2,11 @@
 title: "Etapa 2 e 3"
 ---
 
-As etapas 2 e 3 foram destinadas para modelagem e o problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais. Além disso, o candidato deve avaliar a qualidade e precisão do modelo.
+As etapas 2 e 3 foram destinadas para modelagem. O problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais e além disso, o candidato deve avaliar a qualidade e precisão do modelo.
 
-Algumas ressalvas precisam ser feitas em relação a task pedida, a documentação da OU (Open University) e a integridade dos dados.
+No entanto algumas ressalvas precisam ser feitas: em relação a task pedida, a documentação da OU (Open University) e a integridade dos dados.
 
-As avaliações finais no dataset correspondem a classe *"Exam"*, presente na variável `assessment_type`. No entanto, possuímos muitos valores missing nesta variável e sua importância para composição da nota final é muitas vezes dúbia. Isso por que encontramos estudantes que pontuaram 0 no `Exam` e ainda assim foram aprovados, assim como estudantes que não fizeram o teste e foram aprovados.
+As avaliações finais no dataset correspondem a classe *"Exam"*, presente na variável `assessment_type`. No entanto, possuímos muitos valores missing nesta variável e sua importância para composição da nota final é muitas vezes dúbia. Isso por que encontramos estudantes que pontuaram 0 no `Exam` e ainda assim foram aprovados, assim como estudantes que não fizeram o teste e foram aprovados do mesmo jeito.
 
 Isso por que as avaliações finais servem para compor sua nota final, valor esse que de fato vai indicar se o estudante foi aprovado ou não no curso. E essa composição não é dita na documentação dos dados, e é pouco provável de ser encontrada apenas pela análise dos dados atuais.
 
@@ -29,12 +29,15 @@ library(sf)
 library(geofacet)
 library(rlang)
 library(plotly)
+library(tidymodels)
+library(DT)
+library(kableExtra)
 ```
 
 
 # Procedimento adotado
 
-Diante ao que dito, o procedimento adotado aqui foi o de retirar os valores missings da variável `assessment_type` e trabalhar com as informações que sobrarem. Sendo que essa é nossa variável target, não faria sentido utilizar nenhum método de imputação nela.
+Diante ao que foi dito, o procedimento adotado aqui foi o de retirar os valores missings da variável `assessment_type` e trabalhar com as informações que sobrarem. Sendo que essa é nossa variável target, não faria sentido utilizar nenhum método de imputação nela.
 
 Para obter o dataset para modelagem precisamos realizar uma série de joins entre as tableas disponíveis, para que cada observação dos dados fosse composta por um estudante de um determinado período e curso diferente.
 
@@ -64,6 +67,13 @@ exam_info_tbl <- student_info %>%
 ```
 
 
+```{r}
+kbl(exam_info_tbl %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
+
+```
+
 Algumas variáveis não fazem sentido serem adicionadas para treino do modelo, pois não são informações previamente disponíveis para cada estudante, ou seja, elas aconteceram apenas no futuro e portanto não tem como serem usadas como preditoras. Por conta disso, iremos dropar algumas features.
 
 ```{r}
@@ -72,9 +82,9 @@ exam_info_v2_tbl <- exam_info_tbl %>%
 
 ```
 
-Meu intuito inicial era realizar a previsão do desempenho por curso, porém, como temos poucos dados fica inviável tão abordagem. 
+Meu intuito inicial era realizar a previsão do desempenho por curso, porém, como temos poucos dados fica inviável tal abordagem. 
 
-Como nosso dataset é predominante categórico, é super interessante observar como está a distribuição das diferentes classes. Para isso eu criei uma função que nos permite visualizar todas as features com apenas um comando.
+Como nosso dataset é predominantemente categórico, é super interessante observar como está a distribuição das diferentes classes. Para isso eu criei uma função que nos permite visualizar todas as features com apenas um comando.
 
 ```{r}
 plot_all_full_data <- function(name = "region") {
@@ -84,12 +94,22 @@ plot_all_full_data <- function(name = "region") {
     mutate(prop = n/sum(n)) %>% 
     ggplot(aes(y = fct_reorder(.data[[name]], prop),
                x = prop)) +
-    geom_col()
+    geom_segment(aes(xend = 0, yend = .data[[name]]),
+                 show.legend = F) +
+    geom_point(aes(size = prop),
+               show.legend = F) +
+    geom_label(aes(label = prop %>% scales::number(accuracy = .01), size = prop*50), 
+               fill = "white", 
+               hjust = "inward",
+               show.legend = F) +
+    theme_minimal() +
+    labs(
+      y = name
+    )
 }
 
-
 names <- names(exam_info_v2_tbl %>% select(where(is.character)))
-all_plots <- map(names, .f = plot_all)
+all_plots <- map(names, .f = plot_all_full_data)
 cowplot::plot_grid(plotlist = all_plots)
 
 ```
@@ -100,6 +120,10 @@ Além disso, a variável `imd_band` possui alguns valores missing. Por enquanto 
 
 ```{r}
 exam_info_final_tbl <- exam_info_v2_tbl %>% select(-imd_band)
+
+kbl(exam_info_final_tbl %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
 
 ```
 
@@ -113,6 +137,7 @@ Precisamos dividir nossos dados entre treino e teste. Um problema que pode ocorr
 Nesse caso eu optei pela variável `highest_education` por conter algumas classes com pouquísimos valores.
 
 ```{r}
+set.seed(1234)
 splits <- initial_split(prop = .7, strata = "highest_education", data = exam_info_final_tbl)
 
 train <- training(splits)
@@ -130,7 +155,18 @@ plot_all_full_train <- function(name = "region") {
     mutate(prop = n/sum(n)) %>% 
     ggplot(aes(y = fct_reorder(.data[[name]], prop),
                x = prop)) +
-    geom_col()
+    geom_segment(aes(xend = 0, yend = .data[[name]]),
+                 show.legend = F) +
+    geom_point(aes(size = prop),
+               show.legend = F) +
+    geom_label(aes(label = prop %>% scales::number(accuracy = .01), size = prop*50), 
+               fill = "white", 
+               hjust = "inward",
+               show.legend = F) +
+    theme_minimal() +
+    labs(
+      y = name
+    )
 }
 
 names <- names(train %>% select(where(is.character)))
@@ -145,14 +181,25 @@ plot_all_full_test <- function(name = "region") {
     mutate(prop = n/sum(n)) %>% 
     ggplot(aes(y = fct_reorder(.data[[name]], prop),
                x = prop)) +
-    geom_col()
+    geom_segment(aes(xend = 0, yend = .data[[name]]),
+                 show.legend = F) +
+    geom_point(aes(size = prop),
+               show.legend = F) +
+    geom_label(aes(label = prop %>% scales::number(accuracy = .01), size = prop*50), 
+               fill = "white", 
+               hjust = "inward",
+               show.legend = F) +
+    theme_minimal() +
+    labs(
+      y = name
+    )
 }
 
 names <- names(test %>% select(where(is.character)))
 all_plots <- map(names, plot_all_full_test)
 cowplot::plot_grid(plotlist = all_plots)
 
-student_final_result_tbl
+
 ```
 
 Visualizamos que em ambos os casos as proporções foram mantidas, o que é importante para generalização do modelo.
@@ -170,15 +217,16 @@ recipe_spec <- recipe(final_score_exam ~ ., data = train) %>%
   step_dummy(all_predictors(), -num_of_prev_attempts, -age_band, one_hot = T)
 
 
-recipe_spec %>% prep() %>% juice() %>% glimpse()
-
+kbl(recipe_spec %>% prep() %>% juice() %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
 ```
 
 Explicação dos steps:
 
-- update_role: cria uma especificação para algumas variáveis que não serão utilizadas como preditores mas terão um papel de identificação.
-- step_string2factor: conversão de variáveis categóricas para fator
-- step_dummy: aplicação do one-hot-encoding
+- **update_role**: cria uma especificação para algumas variáveis que não serão utilizadas como preditores mas terão um papel de identificação.
+- **step_string2factor**: conversão de variáveis categóricas para fator
+- **step_dummy**: aplicação do one-hot-encoding
 
 # Model
 
@@ -207,6 +255,9 @@ wf_rf_spec <- workflow() %>%
 # 2 - workflow linear regression
 wf_lm_spec <- wf_rf_spec %>% update_model(lm_spec)
 
+# objetos workflow
+wf_rf_spec
+wf_lm_spec
 ```
 
 # Fit
@@ -256,27 +307,30 @@ results_treino %>%
 
 ```
 
-Vemos que os dois modelos possuem valores bem próximos do RMSE, quase 19.8 e 19.9. Podemos então visualizar os resíduos.
+Vemos que os dois modelos possuem valores bem próximos do RMSE, quase 19.8 e 19.9. Podemos então visualizar o resultado dos valores preditos vs valores reais.
 
 ```{r}
 results_test %>%
   #filter(model == "rf") %>% 
-  mutate(task = "testing") %>%
+  mutate(task = "Testing") %>%
   bind_rows(results_treino %>%
-              mutate(task = "training")) %>%
+              mutate(task = "Training")) %>%
   ggplot(aes(valor_real, .pred, color = model)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
   geom_point(alpha = 0.5) +
+  scale_color_manual(values = c("#012623", "#04BF68")) +
   facet_wrap(~task) +
   labs(
-    x = "Truth",
-    y = "Predicted attendance",
-    color = "Type of model"
-  )
+    x = "Valor Real",
+    y = "Performance Predita",
+    color = "Tipo de modelo",
+    title = "Valores reais vs valores observados nas previsões"
+  ) +
+  theme_minimal()
 
 ```
 
-Pelo gráfico dos resíduos vemos que os dois modelos tiveram resultados bem próximos, tanto nos dados de treino quanto nos dados de teste. O ideal de um gráfico de resíduos é que esteja o mai próximo possível de uma linha reta, porém nossos resultados não foram muito bons. 
+Pelo gráfico dos resíduos vemos que os dois modelos tiveram resultados bem próximos, tanto nos dados de treino quanto nos dados de teste. O ideal formato desse gráfico é que os pontos estejam o mais próximo possível de uma linha reta, porém nossos resultados não foram muito bons, ainda existe muita variância para ser explicada pelo modelo.
 
 Podemos aplicar uma técnica de resampling para investigar como o modelo se comporta em diferentes dados de validação.
 
@@ -338,7 +392,10 @@ tune_results_rf <- wflw_spec_rf_tune %>%
     )
 toc()
 
-tune_results_rf %>% show_best(metric = "rsq")
+
+kbl(tune_results_rf %>% show_best(metric = "rmse")) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
 
 ```
 
@@ -348,7 +405,7 @@ Uma alternativa que proponho é a avaliação da performance dos estudantes util
 
 # Classification
 
-Vamos ver então como se sai o modelo de classificação.
+Vamos ver então como se sai o modelo de classificação. Para isso, vamos precisar fazer alguns ajustes nos dados, veja o código abaixo.
 
 ```{r}
 student_final_result_tbl <- student_info %>% 
@@ -368,7 +425,18 @@ plot_all_full_trans <- function(name = "region") {
     mutate(prop = n/sum(n)) %>% 
     ggplot(aes(y = fct_reorder(.data[[name]], prop),
                x = prop)) +
-    geom_col()
+    geom_segment(aes(xend = 0, yend = .data[[name]]),
+                 show.legend = F) +
+    geom_point(aes(size = prop),
+               show.legend = F) +
+    geom_label(aes(label = prop %>% scales::number(accuracy = .01), size = prop*50), 
+               fill = "white", 
+               hjust = "inward",
+               show.legend = F) +
+    theme_minimal() +
+    labs(
+      y = name
+    )
 }
 
 names <- names(student_final_result_tbl %>% select(where(is.factor)))
@@ -380,9 +448,9 @@ cowplot::plot_grid(plotlist = all_plots)
 
 Classes com valores muito baixos podem gerar problemas na hora das divisões entre treino e teste, por isso iremos agrupar algumas classes segundo descrição abaixo:
 
-- age_band: vai passar a ter duas variáveis categóricas, de 0 a 35 anos e acima de 35 anos.
-- highest_education: vai passar a ter uma variável chamada "outros" oriunda da junção de `HE Qualification`, `No Formal quals` e `Post Graduate Qualification`.
-- final_result: `Withdrawn` e `Fail` serão consideradas como `Fail` e `Distinction` e `Pass` como `Pass`.
+- **age_band**: vai passar a ter duas variáveis categóricas, de 0 a 35 anos e acima de 35 anos.
+- **highest_education**: vai passar a ter uma variável chamada "outros" oriunda da junção de `HE Qualification`, `No Formal quals` e `Post Graduate Qualification`.
+- **final_result**: `Withdrawn` e `Fail` serão consideradas como `Fail` e `Distinction` e `Pass` como `Pass`.
 
 ```{r}
 student_final_result_v2_tbl <- student_final_result_tbl %>% 
@@ -408,6 +476,10 @@ student_final_result_v2_tbl <- student_final_result_tbl %>%
   )) %>% 
   mutate(final_result = as.factor(final_result))
 
+kbl(student_final_result_v2_tbl %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
+
 ```
 
 Vamos visualizar nossas variáveis categóricas mais uma vez antes da modelagem.
@@ -421,7 +493,18 @@ plot_all_full_prepro <- function(name = "region") {
     mutate(prop = n/sum(n)) %>% 
     ggplot(aes(y = fct_reorder(.data[[name]], prop),
                x = prop)) +
-    geom_col()
+    geom_segment(aes(xend = 0, yend = .data[[name]]),
+                 show.legend = F) +
+    geom_point(aes(size = prop),
+               show.legend = F) +
+    geom_label(aes(label = prop %>% scales::number(accuracy = .01), size = prop*50), 
+               fill = "white", 
+               hjust = "inward",
+               show.legend = F) +
+    theme_minimal() +
+    labs(
+      y = name
+    )
 }
 
 names <- names(student_final_result_v2_tbl %>% select(where(is.factor)))
@@ -444,8 +527,11 @@ test <- testing(splits)
 recipe_class_rf_spec <- recipe(final_result ~ ., data = train) %>% 
   update_role(code_presentation, id_student, new_role = "Identification") %>%
   step_dummy(all_predictors(), -num_of_prev_attempts, -age_band, -imd_band, -highest_education)
-  
-recipe_class_rf_spec %>% prep() %>% juice() %>% glimpse()
+
+# dataset para o random forest  
+kbl(recipe_class_rf_spec %>% prep() %>% juice() %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
 
 # recipe log regression
 recipe_class_logreg_spec <- recipe(final_result ~ ., data = train) %>% 
@@ -453,8 +539,15 @@ recipe_class_logreg_spec <- recipe(final_result ~ ., data = train) %>%
   step_ordinalscore(highest_education, imd_band, age_band) %>% 
   step_dummy(all_predictors(), -num_of_prev_attempts, -age_band, -imd_band, -highest_education)
 
-recipe_class_logreg_spec %>% prep() %>% juice() %>% glimpse()
+# dataset para o log regression
+kbl(recipe_class_logreg_spec %>% prep() %>% juice() %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
+```
 
+Vamos agora a criação dos workflows, muito similar ao que fizemos anteriormente.
+
+```{r}
 # models
 model_lr <- logistic_reg(mode = "classification") %>% 
   set_engine("glm")
@@ -475,6 +568,11 @@ rf_wflow <- workflow() %>%
   add_recipe(recipe_class_rf_spec) %>%
   add_model(model_rf) 
 
+```
+
+Como tudo organizado, agora pode sim seguir para treino e predição dos modelos.
+
+```{r}
 # treino
 # treino do modelo com logistic regression
 model_log_fit <- lr_wflow %>% 
@@ -498,7 +596,26 @@ pbp_pred_rf <- pred_rf %>%
   bind_cols(test %>% select(final_result)) %>% 
   # adicionando coluna com as probabilidades
   bind_cols(predict(model_rf_fit, test, type = "prob"))
+```
 
+A saída de cada predição pode ser vista abaixo.
+
+```{r}
+# logistic regression
+kbl(pbp_pred_lr %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
+
+# random forest
+kbl(pbp_pred_rf %>% head()) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
+
+```
+
+E por fim avaliação das nossas métricas.
+
+```{r}
 # Random Forest -------------------------------------------------------
 # acurácia e kap
 pbp_pred_rf %>% 
@@ -508,17 +625,6 @@ pbp_pred_rf %>%
 # confusion matrix
 pbp_pred_rf %>% 
   conf_mat(final_result, .pred_class)
-
-# roc_auc
-pbp_pred_rf %>%
-  roc_auc(truth = final_result,
-          .pred_Pass)
-
-# Visualizando a roc_curve
-pbp_pred_rf %>%
-  roc_curve(truth = final_result,
-            .pred_Fail) %>%
-  autoplot()
 
 # Log reg ----------------------
 # acurácia e kap
@@ -530,26 +636,58 @@ pbp_pred_lr %>%
 pbp_pred_lr %>% 
   conf_mat(final_result, .pred_class)
 
-# roc_auc
-pbp_pred_lr %>%
-  roc_auc(truth = final_result,
-          .pred_Pass)
+```
 
-# Visualizando a roc_curve
-pbp_pred_lr %>%
+Nesse momento nós temos duas informações importantes sobre nossos modelos, acurácia e confusion matrix. A acurácia do random forest é alguns pontos maior que a do logistic regression, porém o modelo de logistic regression se saiu melhor em identificar estudantes que seriam reprovados (Fail).
+
+Eu prefiro analisar uma outra métrica a ROC AUC, pois é uma métrica mais robusta quando comparada as outras.
+
+Visualizando a curva ROC para os dois modelos.
+
+```{r}
+# lr roc auc
+roc_auc_lr <- pbp_pred_lr %>%
   roc_curve(truth = final_result,
-            .pred_Fail) %>%
-  autoplot()
+          .pred_Fail) %>% 
+  mutate(model = "Logistic Regression")
 
+# rf roc auc
+roc_auc_rf <- pbp_pred_rf %>%
+  roc_curve(truth = final_result,
+            .pred_Fail)%>% 
+  mutate(model = "Random Forest")
+
+geral_roc_auc <- bind_rows(roc_auc_lr, roc_auc_rf)
+
+geral_roc_auc %>%
+  ggplot(aes(x = 1 - specificity,
+             y = sensitivity,
+             color = model)) +
+  geom_line(size = 1.5, alpha = .7) +
+    geom_abline(
+    lty = 2, alpha = 0.5,
+    color = "gray50",
+    size = .8
+  ) +
+  scale_color_manual(values = c("#329429", "#23664B")) +
+  theme_minimal() +
+  labs(
+    title = "Curva ROC dos dois modelos utilizados"
+  )
 
 ```
 
+Assim vemos que o random forest se saiu melhor, pois possui uma área maior abaixo da curva.
+
+Nesse ponto eu fiz mais um tunning, dessa vez para o xgboost e random forest, como o procedimento levou um certo tempo, eu preferir deixar o código comentado e salvei os modelos já treinados, que você pode encontrar na pasta do projeto.
 
 ```{r}
 # estimate perfomance with cross validation
 # set.seed(123)
 # score_fold <- vfold_cv(train, v = 5, strata = final_result)
 # 
+
+# xgboost -------------------------------------------------------
 # tune_xgb <- boost_tree(
 #   trees = 1000,
 #   tree_depth = tune(), min_n = tune(),
@@ -561,14 +699,14 @@ pbp_pred_lr %>%
 #   set_mode("classification")
 # 
 # 
-# # Tunning Workflow -------------------------------------
+# # Tunning Workflow
 # 
 # tune_xgb_wflw <- workflow() %>%
 #   add_model(tune_xgb) %>%
 #   add_recipe(recipe_class_logreg_spec)
 # 
 # 
-# # Tunning grid -----------------------------------------
+# # Tunning grid
 # 
 # xgb_grid <- grid_latin_hypercube(
 #   tree_depth(),
@@ -607,47 +745,16 @@ pbp_pred_lr %>%
 # 
 # saveRDS(model_xgb_best_fit, "model_xgb_best_fit.rds")
 
-model_xgb_best_fit <- readRDS("model_xgb_best_fit.rds")
 
-# predições com o modelo treinado de logistic regression
-pred_xgb <- predict(model_xgb_best_fit, test)
-pbp_pred_xg <- pred_xgb %>% 
-  bind_cols(test %>% select(final_result)) %>% 
-  # adicionando coluna com as probabilidades
-  bind_cols(predict(model_xgb_best_fit, test, type = "prob"))
-
-# xgb -------------------------------------------------------
-# acurácia e kap
-pbp_pred_xg %>% 
-  metrics(truth = final_result, 
-          .pred_class)
-
-# confusion matrix
-pbp_pred_xg %>% 
-  conf_mat(final_result, .pred_class)
-
-# roc_auc
-pbp_pred_xg %>%
-  roc_auc(truth = final_result,
-          .pred_Fail)
-
-# Visualizando a roc_curve
-pbp_pred_xg %>%
-  roc_curve(truth = final_result,
-            .pred_Fail) %>%
-  autoplot()
-
-
-# random forest -------------------
-
+# random forest ------------------------------------------
 # rf_tuning_spec <- rand_forest(
 #   mtry = tune(),
 #   trees = 1000,
 #   min_n = tune()
 # ) %>%
 #   set_mode("classification") %>%
-#   set_engine("ranger")  
-# 
+#   set_engine("ranger")
+# # 
 # tune_rf_wf <- workflow() %>%
 #   add_model(rf_tuning_spec) %>%
 #   add_recipe(recipe_class_spec)
@@ -674,34 +781,42 @@ pbp_pred_xg %>%
 # 
 # saveRDS(final_rf, "final_rf.rds")
 
+```
+
+
+
+```{r}
+model_xgb_best_fit <- readRDS("model_xgb_best_fit.rds")
+
+# predições com o modelo treinado de logistic regression
+pred_xgb_tuned <- predict(model_xgb_best_fit, test)
+pbp_pred_xg <- pred_xgb_tuned %>% 
+  bind_cols(test %>% select(final_result)) %>% 
+  # adicionando coluna com as probabilidades
+  bind_cols(predict(model_xgb_best_fit, test, type = "prob"))
+
+# xgb -------------------------------------------------------
+# acurácia e kap
+pbp_pred_xg %>% 
+  metrics(truth = final_result, 
+          .pred_class)
+
+# confusion matrix
+pbp_pred_xg %>% 
+  conf_mat(final_result, .pred_class)
+
+
+# random forest -------------------------------------------
 final_rf <- readRDS("final_rf.rds")
-
-# Finalizando com o melhor modelo do tunning
-final_rf <- finalize_workflow(
-  tune_rf_wf,
-  best_fit_auc
-)
-
-
-# # Como nós precisamos fazer alterações nos dados de teste
-# # que estão fora da receita de pré-processamento (recipe)
-# # não poderemos utilizar o last_fit(), e por isso
-# # o re-treino com o melhor modelo foi feito manualmente.
-# 
-# 
-# Treino com o melhor modelo de xgboost --------------------------------------
 
 model_rf_best_fit <- final_rf %>%
   fit(data = train)
-
-## Previsões com o melhor modelo de xgboost ----------------------------------
 
 pred_rf <- predict(model_rf_best_fit, test)
 pbp_pred_rf <- pred_rf %>%
   bind_cols(test %>% select(final_result)) %>%
   bind_cols(predict(model_rf_best_fit, test, type = "prob"))
 
-## Métricas do melhor modelo de xgboost --------------------------------------
 # acurácia e kap
 pbp_pred_rf %>%
   metrics(truth = final_result,
@@ -711,45 +826,91 @@ pbp_pred_rf %>%
 pbp_pred_rf %>%
   conf_mat(final_result, .pred_class)
 
-# Visualizando a roc_curve
-pbp_pred_rf %>%
-  roc_curve(truth = final_result,
-            .pred_Fail) %>%
-  autoplot()
+```
 
+```{r}
+# roc_auc
+roc_auc_xg_tuned <- pbp_pred_xg %>%
+  roc_curve(truth = final_result,
+          .pred_Fail) %>% 
+  mutate(model = "Xgboost - Tunned")
+
+# Visualizando a roc_curve
+roc_auc_rf_tuned <- pbp_pred_rf %>%
+  roc_curve(truth = final_result,
+            .pred_Fail) %>% 
+  mutate(model = "Random Forest - Tunned")
+
+geral_roc_auc <- bind_rows(roc_auc_lr, roc_auc_rf, roc_auc_xg_tuned, roc_auc_rf_tuned)
+
+geral_roc_auc %>%
+  ggplot(aes(x = 1 - specificity,
+             y = sensitivity,
+             color = model)) +
+  geom_line(size = 1.5, alpha = .7) +
+    geom_abline(
+    lty = 2, alpha = 0.5,
+    color = "gray50",
+    size = .8
+  ) +
+  scale_color_manual(values = c("#329429", "#23664B", "#1BA673", "#8C520A")) +
+  theme_minimal() +
+  labs(
+    title = "Curva ROC dos dois modelos utilizados"
+  )
+
+# roc_auc all models
+roc_auc_lr_values <- pbp_pred_lr %>%
+  roc_auc(truth = final_result,
+          .pred_Fail) %>% 
+  mutate(model = "Logistic Regression")
+
+roc_auc_rf_values <- pbp_pred_rf %>%
+  roc_auc(truth = final_result,
+            .pred_Fail)%>% 
+  mutate(model = "Random Forest")
+
+roc_auc_xg_tuned_values <- pbp_pred_xg %>%
+  roc_auc(truth = final_result,
+          .pred_Fail) %>% 
+  mutate(model = "Xgboost - Tunned")
+
+roc_auc_rf_tuned_values <- pbp_pred_rf %>%
+  roc_auc(truth = final_result,
+            .pred_Fail) %>% 
+  mutate(model = "Random Forest - Tunned")
+
+geral_roc_auc_values <- bind_rows(roc_auc_lr_values, roc_auc_rf_values, roc_auc_xg_tuned_values, roc_auc_rf_tuned_values) %>% arrange(desc(.estimate))
+
+# tabela com todos os quatro modelos treinados
+kbl(geral_roc_auc_values) %>%
+  kable_paper("striped") %>%
+  scroll_box(width = "100%")
 
 ```
 
-Importância das variáveis. Para regressão logistica converter para numérico
+O que podemos ver, tanto pelo gráfico quanto pelas estimativas é que o xgboost performou melhor que os outros modelos quando avaliado nos dados de teste, e certamente será nossa escolha.
+
+Por fim, eu trago aqui um plot de importância de variáveis, por ser um entendimento interessante para o negócio.
 
 ```{r}
 library(vip)
 # logistic_regression
-g1 <- model_xgb_best_fit %>% 
+model_xgb_best_fit %>% 
   pull_workflow_fit() %>% 
   vip(num_features = 10) +
-  geom_col(fill = "#2A43DE") +
+  geom_col(fill = "#23664B") +
   theme_minimal() +
   labs(
-    title = "Variáveis mais importantes \npara o modelo de Logistic Regression"
+    title = "Variáveis mais importantes \npara o modelo de XGboost tunado"
   )
 
-g1 <- model_log_fit %>% 
-  pull_workflow_fit() %>% 
-  vip(num_features = 10) +
-  geom_col(fill = "#2A43DE") +
-  theme_minimal() +
-  labs(
-    title = "Variáveis mais importantes \npara o modelo de Logistic Regression"
-  )
 ```
 
+Veja que o top 3 de variáveis mais importantes são:
 
-# Feature Engineering
+1. `highest_education` 
+1. `imd_band`
+1. `num_of_prev_attempts`
 
-Adição de novas features:
-
-- taxa de reprovação
-- taxa de aprovação
-- quantidade de material de consulta
-- taxa de click na plataforma 
+Ambas relacionadas com o nível educacional prévio do estudante, nível de carência da região em que mora e se o mesmo é ou não repetente naquele curso.
