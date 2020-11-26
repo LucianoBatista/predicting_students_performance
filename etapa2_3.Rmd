@@ -7,13 +7,18 @@ body {
 text-align: justify}
 </style>
 
-As etapas 2 e 3 foram destinadas para modelagem. O problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais e além disso, o candidato deve avaliar a qualidade e precisão do modelo.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, dpi = 300, fig.align = "center", fig.width = 10, fig.height = 7)
+
+```
+
+As etapas 2 e 3 foram destinadas para modelagem. O problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais e além disso, o candidato deveria avaliar a qualidade e precisão do modelo.
 
 No entanto algumas ressalvas precisam ser feitas: em relação a task pedida, a documentação da OU (Open University) e a integridade dos dados.
 
 As avaliações finais no dataset correspondem a classe *"Exam"*, presente na variável `assessment_type`. No entanto, possuímos muitos valores missing nesta variável e sua importância para composição da nota final é muitas vezes dúbia. Isso por que encontramos estudantes que pontuaram 0 no `Exam` e ainda assim foram aprovados, assim como estudantes que não fizeram o teste e foram aprovados do mesmo jeito.
 
-Isso por que as avaliações finais servem para compor sua nota final, valor esse que de fato vai indicar se o estudante foi aprovado ou não no curso. E essa composição não é dita na documentação dos dados, e é pouco provável de ser encontrada apenas pela análise dos dados atuais.
+Uma explicação é que as avaliações finais servem para compor sua nota final, valor esse que de fato vai indicar se o estudante foi aprovado ou não no curso. E essa composição não é dita na documentação dos dados, e é pouco provável de ser encontrada apenas pela análise dos dados atuais.
 
 Tem mais um ponto que precisa ser comentado, ao pensar em utilizar as notas individuais em cada avaliação encontrei outro problema. Alguns cursos zeraram os pesos de cada teste, gerando assim mais incosistências em relação a correlação de quem foi aprovado ou não e seu desempenho. 
 
@@ -78,6 +83,7 @@ kbl(exam_info_tbl %>% head()) %>%
   scroll_box(width = "100%")
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Algumas variáveis não fazem sentido serem adicionadas para treino do modelo, pois não são informações previamente disponíveis para cada estudante, ou seja, elas aconteceram apenas no futuro e portanto não tem como serem usadas como preditoras. Por conta disso, iremos dropar algumas features.
 
@@ -362,7 +368,7 @@ rf_res %>%
 
 O melhor RMSE considerando a média dos 5 conjuntos de dados de validação foi de 20.1, o que é um valor um pouco maior do que quando considerado apenas os dados de treino. A explicação é que na técnica de resampling você acaba reduzindo ainda mais os dados para ser possível treinar em uma parte e investigar a performance em outra, e como os dados já eram poucos fica mais difícil de capturar algum padrão nos dados.
 
-# tunning
+# Tunning
 
 O Random Forest é um algorítmo que possui alguns parâmetros que podem ser otimizados em cada resample no intuito de otimizar alguma métrica, essa técnica é conhecida como tunning dos parâmetros.
 
@@ -403,10 +409,12 @@ kbl(tune_results_rf %>% show_best(metric = "rmse")) %>%
   scroll_box(width = "100%")
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Acabamos aumentando os valores do RMSE. Ao final, nosso melhor modelo performou muito ruim, explicando minimamente a variância presente nos dados e com RMSE de aproximadamente 20. Realmente acredito que não tem muito a ser feito nesse modelo de regressão, pois precisamos de mais dados e mais variáveis. 
 
 Uma alternativa que proponho é a avaliação da performance dos estudantes utilizando um modelo de classificação e a variável de `final_result` para prever a probabilidade do estudante ser aprovado ou não.
+<p style="margin-bottom:40px"></p>
 
 # Classification
 
@@ -486,6 +494,7 @@ kbl(student_final_result_v2_tbl %>% head()) %>%
   scroll_box(width = "100%")
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Vamos visualizar nossas variáveis categóricas mais uma vez antes da modelagem.
 
@@ -575,7 +584,7 @@ rf_wflow <- workflow() %>%
 
 ```
 
-Como tudo organizado, agora pode sim seguir para treino e predição dos modelos.
+Com tudo organizado, agora podemos seguir para treino e predição dos modelos.
 
 ```{r}
 # treino
