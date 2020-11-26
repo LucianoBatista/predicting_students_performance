@@ -779,7 +779,7 @@ Distinction
 <span id="cb5-9"><a href="#cb5-9"></a>                 <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
 <span id="cb5-10"><a href="#cb5-10"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">size =</span> prop),</span>
 <span id="cb5-11"><a href="#cb5-11"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">8</span>), </span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">5</span>), </span>
 <span id="cb5-13"><a href="#cb5-13"></a>               <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>, </span>
 <span id="cb5-14"><a href="#cb5-14"></a>               <span class="dt">hjust =</span> <span class="st">&quot;inward&quot;</span>,</span>
 <span id="cb5-15"><a href="#cb5-15"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
@@ -792,7 +792,7 @@ Distinction
 <span id="cb5-22"><a href="#cb5-22"></a>names &lt;-<span class="st"> </span><span class="kw">names</span>(exam_info_v2_tbl <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">where</span>(is.character)))</span>
 <span id="cb5-23"><a href="#cb5-23"></a>all_plots &lt;-<span class="st"> </span><span class="kw">map</span>(names, <span class="dt">.f =</span> plot_all_full_data)</span>
 <span id="cb5-24"><a href="#cb5-24"></a>cowplot<span class="op">::</span><span class="kw">plot_grid</span>(<span class="dt">plotlist =</span> all_plots)</span></code></pre></div>
-<p><img src="etapa2_3_files/figure-html/unnamed-chunk-5-1.png" width="3600" style="display: block; margin: auto;" /></p>
+<p><img src="etapa2_3_files/figure-html/unnamed-chunk-5-1.png" width="3000" style="display: block; margin: auto;" /></p>
 <p>Vimos aqui que algumas classes são bem desiquilibradas e isso pode ser um problema para nossa previsão. Por enquanto seguiremos desta forma para criação de um modelo baseline.</p>
 <p>Além disso, a variável <code>imd_band</code> possui alguns valores missing. Por enquanto a mesma não será considerada.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>exam_info_final_tbl &lt;-<span class="st"> </span>exam_info_v2_tbl <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>imd_band)</span>
@@ -1055,7 +1055,7 @@ N
 <span id="cb8-9"><a href="#cb8-9"></a>                 <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
 <span id="cb8-10"><a href="#cb8-10"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">size =</span> prop),</span>
 <span id="cb8-11"><a href="#cb8-11"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">8</span>), </span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">5</span>), </span>
 <span id="cb8-13"><a href="#cb8-13"></a>               <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>, </span>
 <span id="cb8-14"><a href="#cb8-14"></a>               <span class="dt">hjust =</span> <span class="st">&quot;inward&quot;</span>,</span>
 <span id="cb8-15"><a href="#cb8-15"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
@@ -1068,7 +1068,7 @@ N
 <span id="cb8-22"><a href="#cb8-22"></a>names &lt;-<span class="st"> </span><span class="kw">names</span>(train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">where</span>(is.character)))</span>
 <span id="cb8-23"><a href="#cb8-23"></a>all_plots &lt;-<span class="st"> </span><span class="kw">map</span>(names, plot_all_full_train)</span>
 <span id="cb8-24"><a href="#cb8-24"></a>cowplot<span class="op">::</span><span class="kw">plot_grid</span>(<span class="dt">plotlist =</span> all_plots)</span></code></pre></div>
-<p><img src="etapa2_3_files/figure-html/unnamed-chunk-8-1.png" width="3600" style="display: block; margin: auto;" /></p>
+<p><img src="etapa2_3_files/figure-html/unnamed-chunk-8-1.png" width="3000" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>plot_all_full_test &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">name =</span> <span class="st">&quot;region&quot;</span>) {</span>
 <span id="cb9-2"><a href="#cb9-2"></a>  </span>
 <span id="cb9-3"><a href="#cb9-3"></a>  test <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -1080,7 +1080,7 @@ N
 <span id="cb9-9"><a href="#cb9-9"></a>                 <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
 <span id="cb9-10"><a href="#cb9-10"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">size =</span> prop),</span>
 <span id="cb9-11"><a href="#cb9-11"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">8</span>), </span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">5</span>), </span>
 <span id="cb9-13"><a href="#cb9-13"></a>               <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>, </span>
 <span id="cb9-14"><a href="#cb9-14"></a>               <span class="dt">hjust =</span> <span class="st">&quot;inward&quot;</span>,</span>
 <span id="cb9-15"><a href="#cb9-15"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
@@ -1093,7 +1093,7 @@ N
 <span id="cb9-22"><a href="#cb9-22"></a>names &lt;-<span class="st"> </span><span class="kw">names</span>(test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">where</span>(is.character)))</span>
 <span id="cb9-23"><a href="#cb9-23"></a>all_plots &lt;-<span class="st"> </span><span class="kw">map</span>(names, plot_all_full_test)</span>
 <span id="cb9-24"><a href="#cb9-24"></a>cowplot<span class="op">::</span><span class="kw">plot_grid</span>(<span class="dt">plotlist =</span> all_plots)</span></code></pre></div>
-<p><img src="etapa2_3_files/figure-html/unnamed-chunk-8-2.png" width="3600" style="display: block; margin: auto;" /></p>
+<p><img src="etapa2_3_files/figure-html/unnamed-chunk-8-2.png" width="3000" style="display: block; margin: auto;" /></p>
 <p>Visualizamos que em ambos os casos as proporções foram mantidas, o que é importante para generalização do modelo.</p>
 </div>
 <div id="recipe" class="section level1">
@@ -1907,7 +1907,7 @@ Curso C
 <span id="cb26-27"><a href="#cb26-27"></a>        <span class="dt">control   =</span> <span class="kw">control_grid</span>(<span class="dt">verbose =</span> <span class="ot">TRUE</span>, <span class="dt">allow_par =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb26-28"><a href="#cb26-28"></a>    )</span>
 <span id="cb26-29"><a href="#cb26-29"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>## 166.741 sec elapsed</code></pre>
+<pre><code>## 169.633 sec elapsed</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">kbl</span>(tune_results_rf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">show_best</span>(<span class="dt">metric =</span> <span class="st">&quot;rmse&quot;</span>)) <span class="op">%&gt;%</span></span>
 <span id="cb28-2"><a href="#cb28-2"></a><span class="st">  </span><span class="kw">kable_paper</span>(<span class="st">&quot;striped&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb28-3"><a href="#cb28-3"></a><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>)</span></code></pre></div>
@@ -2438,7 +2438,7 @@ Pass
 <span id="cb31-10"><a href="#cb31-10"></a>                 <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
 <span id="cb31-11"><a href="#cb31-11"></a><span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">size =</span> prop),</span>
 <span id="cb31-12"><a href="#cb31-12"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
-<span id="cb31-13"><a href="#cb31-13"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">8</span>), </span>
+<span id="cb31-13"><a href="#cb31-13"></a><span class="st">    </span><span class="kw">geom_label</span>(<span class="kw">aes</span>(<span class="dt">label =</span> prop <span class="op">%&gt;%</span><span class="st"> </span>scales<span class="op">::</span><span class="kw">number</span>(<span class="dt">accuracy =</span> <span class="fl">.01</span>), <span class="dt">size =</span> <span class="dv">5</span>), </span>
 <span id="cb31-14"><a href="#cb31-14"></a>               <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>, </span>
 <span id="cb31-15"><a href="#cb31-15"></a>               <span class="dt">hjust =</span> <span class="st">&quot;inward&quot;</span>,</span>
 <span id="cb31-16"><a href="#cb31-16"></a>               <span class="dt">show.legend =</span> F) <span class="op">+</span></span>
@@ -2451,7 +2451,7 @@ Pass
 <span id="cb31-23"><a href="#cb31-23"></a>names &lt;-<span class="st"> </span><span class="kw">names</span>(student_final_result_v2_tbl <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">where</span>(is.factor)))</span>
 <span id="cb31-24"><a href="#cb31-24"></a>all_plots &lt;-<span class="st"> </span><span class="kw">map</span>(names, plot_all_full_prepro)</span>
 <span id="cb31-25"><a href="#cb31-25"></a>cowplot<span class="op">::</span><span class="kw">plot_grid</span>(<span class="dt">plotlist =</span> all_plots)</span></code></pre></div>
-<p><img src="etapa2_3_files/figure-html/unnamed-chunk-19-1.png" width="3600" style="display: block; margin: auto;" /></p>
+<p><img src="etapa2_3_files/figure-html/unnamed-chunk-19-1.png" width="3000" style="display: block; margin: auto;" /></p>
 <p>Pronto, nosso problema agora é uma classificação binomial e pronta modelagem. Vamos iniciar com os splits entre treino e teste.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># split train and test</span></span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="kw">set.seed</span>(<span class="dv">1234</span>)</span>

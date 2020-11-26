@@ -308,28 +308,61 @@ $(document).ready(function () {
 </div>
 
 
-<div id="auxiliando-na-tomada-de-decisão" class="section level2">
-<h2>Auxiliando na Tomada de Decisão!</h2>
+<div id="conclusões-do-case" class="section level1">
+<h1>Conclusões do case</h1>
+<p>Da análise exploratória de dados até a modelagem podemos tirar grandes conclusões sobre nossos dados, abaixo eu listo os principais insights relacionados as ambas as partes.</p>
+<div id="etapa-1" class="section level2">
+<h2>Etapa 1:</h2>
 <ul>
-<li><p>Pode ser interessante um replanejamento dos cursos de menor duração, e assim tentar diminuir a taxa de reprovação nos respectivos períodos.</p></li>
-<li><p>Alguns cursos precisam ser estudadas em mais detalhes:</p>
+<li>Pode ser interessante um replanejamento dos cursos de menor duração, no intuito de tentar diminuir a taxa de reprovação nos respectivos períodos.</li>
+<li>Alguns cursos precisam ser estudados com mais atenção:
 <ul>
-<li>Cursos B e G: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos.</li>
-<li>Curso A: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar para outros cursos.]
+<li><strong>Cursos B e G</strong>: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos.</li>
+<li><strong>Curso A</strong>: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar o padrão para outros cursos.</li>
+</ul></li>
+<li>Os dados mostram que existe maior acesso à plataforma por estudantes de alto desempenho. Sendo assim, pode ser importante o incentivo mais efetivo ao uso da plaforma online.</li>
+<li>Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego e garantindo a escalabilidade do processo.</li>
+<li>Algumas ações de marketing podem ser importantes para promover avanço nos negócios:</li>
+<li>Promover o curso em outras regiões do Reino Unido, além do Sul e da Escócia, pois esses concentram maior parte dos estudantes.</li>
+<li>Promover os cursos para pessoas de faixa-etária acima dos 35 anos, assim como para o público feminino.
 <p style="margin-bottom:40px">
 </p></li>
-</ul></li>
 </ul>
 </div>
-<div id="auxiliando-na-tomada-de-decisão-1" class="section level2">
-<h2>Auxiliando na Tomada de Decisão!</h2>
+<div id="etapas-2-e-3" class="section level2">
+<h2>Etapas 2 e 3:</h2>
 <ul>
-<li><p>Os dados mostram que existe maior acesso à plataforma por estudantes de alto desempenho. Sendo assim, pode ser importante o incentivo mais efetivo ao uso da plaforma online.</p></li>
-<li><p>Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o time de Data Science prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego.</p></li>
-<li><p>Algumas ações de marketing podem ser importantes para promover avanço nos negócios:</p></li>
-<li><p>Promover o curso em outras regiões do Reino Unido, além do Sul e da Escócia, pois esses concentram maior parte dos estudantes.</p></li>
-<li><p>Promover os cursos para pessoas de faixa-etária acima dos 35 anos, assim como para o público feminino.</p></li>
+<li>É preciso definir corretamente a composição de notas finais que levam o estudante a ser aprovado ou não.</li>
+<li>Nossos dados estavam com sérios problemas relacionados a dados missing na variável target o reduzio bastante a quantidade de dados para modelagem.</li>
+<li>O modelo de regressão teve uma performance ruim:
+<ul>
+<li>R²: 0.05 (aproximadamente)</li>
+<li>RMSE: 20</li>
+</ul></li>
+<li>Como alternativa eu criei um modelo de classificação, onde nossa target passou a ser: <em>Fail</em> and <em>Pass</em>.</li>
+<li>Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance no <strong>ROC AUC</strong> de 64,7%</li>
+<li>Dentre as variáveis mais importantes do modelo, nosso top 3 foram:
+<ol style="list-style-type: decimal">
+<li><code>highest_education</code></li>
+<li><code>imd_band</code></li>
+<li><code>num_of_prev_attempts</code></li>
+</ol></li>
 </ul>
+</div>
+<div id="sugestões-de-melhoria-do-modelo" class="section level2">
+<h2>Sugestões de melhoria do modelo</h2>
+<p>Deixo aqui algumas susgestões de melhoria do modelo que não foram implementadas aqui:</p>
+<ul>
+<li>Feature engineering, adicionando variáveis como:
+<ul>
+<li>taxa de desistência por cursos e período</li>
+<li>taxa de aprovação por cursos e período</li>
+<li>materiais de suporte por cursos e período</li>
+<li>taxa de clique na plataforma por cursos e período</li>
+</ul></li>
+</ul>
+<p>Além disso, como agora temos uma ideia do que mais influencia nosso modelo de classificação, questionários poderiam ser elaborados com o intuito coletar informações mais detalhadas em relação a cada um dos quesitos.</p>
+<p>Agradeço a oportunidade de estar participando do processo seletivo, qualquer dúvida deixo meus contatos abaixo:</p>
 <div id="linkedin" class="section level3">
 <h3><a href="https://www.linkedin.com/in/lucianobatistads/">LinkedIn</a></h3>
 </div>
@@ -341,6 +374,7 @@ $(document).ready(function () {
 </div>
 <div id="fonte-dos-dados" class="section level3">
 <h3><a href="https://www.nature.com/articles/sdata2017171">Fonte dos dados</a></h3>
+</div>
 </div>
 </div>
 

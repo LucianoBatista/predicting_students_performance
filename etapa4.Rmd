@@ -2,25 +2,50 @@
 title: "etapa_4"
 ---
 
-## Auxiliando na Tomada de Decisão!
+# Conclusões do case
 
-- Pode ser interessante um replanejamento dos cursos de menor duração, e assim tentar diminuir a taxa de reprovação nos respectivos períodos.
+Da análise exploratória de dados até a modelagem podemos tirar grandes conclusões sobre nossos dados, abaixo eu listo os principais insights relacionados as ambas as partes.
 
-- Alguns cursos precisam ser estudadas em mais detalhes: 
-  - Cursos B e G: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos. 
-  - Curso A: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar para outros cursos.]
-<p style="margin-bottom:40px"></p>
+## Etapa 1:
 
-## Auxiliando na Tomada de Decisão!
-
+- Pode ser interessante um replanejamento dos cursos de menor duração, no intuito de tentar diminuir a taxa de reprovação nos respectivos períodos.
+- Alguns cursos precisam ser estudados com mais atenção: 
+  - **Cursos B e G**: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos. 
+  - **Curso A**: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar o padrão para outros cursos.
 - Os dados mostram que existe maior acesso à plataforma por estudantes de alto desempenho. Sendo assim, pode ser importante o incentivo mais efetivo ao uso da plaforma online.
-
-- Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o time de Data Science prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego.
-
+- Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego e garantindo a escalabilidade do processo.
 - Algumas ações de marketing podem ser importantes para promover avanço nos negócios:
  - Promover o curso em outras regiões do Reino Unido, além do Sul e da Escócia, pois esses concentram maior parte dos estudantes.
  - Promover os cursos para pessoas de faixa-etária acima dos 35 anos, assim como para o público feminino.
+<p style="margin-bottom:40px"></p>
 
+## Etapas 2 e 3:
+
+- É preciso definir corretamente a composição de notas finais que levam o estudante a ser aprovado ou não.
+- Nossos dados estavam com sérios problemas relacionados a dados missing na variável target o reduzio bastante a quantidade de dados para modelagem.
+- O modelo de regressão teve uma performance ruim:
+  - R²: 0.05 (aproximadamente)
+  - RMSE: 20
+- Como alternativa eu criei um modelo de classificação, onde nossa target passou a ser: *Fail* and *Pass*.
+- Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance no **ROC AUC** de 64,7%
+- Dentre as variáveis mais importantes do modelo, nosso top 3 foram:
+  1. `highest_education` 
+  1. `imd_band`
+  1. `num_of_prev_attempts`
+
+## Sugestões de melhoria do modelo
+
+Deixo aqui algumas susgestões de melhoria do modelo que não foram implementadas aqui:
+
+- Feature engineering, adicionando variáveis como:
+  - taxa de desistência por cursos e período
+  - taxa de aprovação por cursos e período
+  - materiais de suporte por cursos e período
+  - taxa de clique na plataforma por cursos e período
+
+Além disso, como agora temos uma ideia do que mais influencia nosso modelo de classificação, questionários poderiam ser elaborados com o intuito coletar informações mais detalhadas em relação a cada um dos quesitos.
+
+Agradeço a oportunidade de estar participando do processo seletivo, qualquer dúvida deixo meus contatos abaixo:
 
 ### [LinkedIn](https://www.linkedin.com/in/lucianobatistads/)
 
