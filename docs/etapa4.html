@@ -11,7 +11,7 @@
 
 
 
-<title>etapa_4</title>
+<title>Etapa 4</title>
 
 <script src="site_libs/header-attrs-2.4.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -303,11 +303,15 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">etapa_4</h1>
+<h1 class="title toc-ignore">Etapa 4</h1>
 
 </div>
 
 
+<style>
+body {
+text-align: justify}
+</style>
 <div id="conclusões-do-case" class="section level1">
 <h1>Conclusões do case</h1>
 <p>Da análise exploratória de dados até a modelagem podemos tirar grandes conclusões sobre nossos dados, abaixo eu listo os principais insights relacionados as ambas as partes.</p>
@@ -336,11 +340,14 @@ $(document).ready(function () {
 <li>Nossos dados estavam com sérios problemas relacionados a dados missing na variável target o reduzio bastante a quantidade de dados para modelagem.</li>
 <li>O modelo de regressão teve uma performance ruim:
 <ul>
-<li>R²: 0.05 (aproximadamente)</li>
-<li>RMSE: 20</li>
+<li><strong>R²</strong>: 0.05 (aproximadamente)</li>
+<li><strong>RMSE</strong>: 20</li>
 </ul></li>
 <li>Como alternativa eu criei um modelo de classificação, onde nossa target passou a ser: <em>Fail</em> and <em>Pass</em>.</li>
-<li>Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance no <strong>ROC AUC</strong> de 64,7%</li>
+<li>Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance de:
+<ul>
+<li><strong>ROC AUC</strong>: 64,7%</li>
+</ul></li>
 <li>Dentre as variáveis mais importantes do modelo, nosso top 3 foram:
 <ol style="list-style-type: decimal">
 <li><code>highest_education</code></li>
@@ -371,9 +378,6 @@ $(document).ready(function () {
 </div>
 <div id="blog" class="section level3">
 <h3><a href="https://lobdata.com.br/">Blog</a></h3>
-</div>
-<div id="fonte-dos-dados" class="section level3">
-<h3><a href="https://www.nature.com/articles/sdata2017171">Fonte dos dados</a></h3>
 </div>
 </div>
 </div>

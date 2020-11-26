@@ -1,6 +1,11 @@
 ---
-title: "etapa_4"
+title: "Etapa 4"
 ---
+
+<style>
+body {
+text-align: justify}
+</style>
 
 # Conclusões do case
 
@@ -24,10 +29,11 @@ Da análise exploratória de dados até a modelagem podemos tirar grandes conclu
 - É preciso definir corretamente a composição de notas finais que levam o estudante a ser aprovado ou não.
 - Nossos dados estavam com sérios problemas relacionados a dados missing na variável target o reduzio bastante a quantidade de dados para modelagem.
 - O modelo de regressão teve uma performance ruim:
-  - R²: 0.05 (aproximadamente)
-  - RMSE: 20
+  - **R²**: 0.05 (aproximadamente)
+  - **RMSE**: 20
 - Como alternativa eu criei um modelo de classificação, onde nossa target passou a ser: *Fail* and *Pass*.
-- Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance no **ROC AUC** de 64,7%
+- Nosso melhor modelo de classificação utilizou o algorítmo xgboost, com uma performance de:
+  - **ROC AUC**: 64,7%
 - Dentre as variáveis mais importantes do modelo, nosso top 3 foram:
   1. `highest_education` 
   1. `imd_band`
@@ -52,5 +58,3 @@ Agradeço a oportunidade de estar participando do processo seletivo, qualquer d�
 ### [GitHub](https://github.com/LucianoBatista)
 
 ### [Blog](https://lobdata.com.br/)
-
-### [Fonte dos dados](https://www.nature.com/articles/sdata2017171)
