@@ -1,0 +1,31 @@
+---
+title: "etapa_4"
+---
+
+## Auxiliando na Tomada de Decisão!
+
+- Pode ser interessante um replanejamento dos cursos de menor duração, e assim tentar diminuir a taxa de reprovação nos respectivos períodos.
+
+- Alguns cursos precisam ser estudadas em mais detalhes: 
+  - Cursos B e G: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos. 
+  - Curso A: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar para outros cursos.]
+<p style="margin-bottom:40px"></p>
+
+## Auxiliando na Tomada de Decisão!
+
+- Os dados mostram que existe maior acesso à plataforma por estudantes de alto desempenho. Sendo assim, pode ser importante o incentivo mais efetivo ao uso da plaforma online.
+
+- Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o time de Data Science prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego.
+
+- Algumas ações de marketing podem ser importantes para promover avanço nos negócios:
+ - Promover o curso em outras regiões do Reino Unido, além do Sul e da Escócia, pois esses concentram maior parte dos estudantes.
+ - Promover os cursos para pessoas de faixa-etária acima dos 35 anos, assim como para o público feminino.
+
+
+### [LinkedIn](https://www.linkedin.com/in/lucianobatistads/)
+
+### [GitHub](https://github.com/LucianoBatista)
+
+### [Blog](https://lobdata.com.br/)
+
+### [Fonte dos dados](https://www.nature.com/articles/sdata2017171)

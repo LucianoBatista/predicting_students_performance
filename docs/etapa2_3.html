@@ -407,6 +407,10 @@ $(document).ready(function () {
 </div>
 
 
+<style>
+body {
+text-align: justify}
+</style>
 <p>As etapas 2 e 3 foram destinadas para modelagem. O problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais e além disso, o candidato deve avaliar a qualidade e precisão do modelo.</p>
 <p>No entanto algumas ressalvas precisam ser feitas: em relação a task pedida, a documentação da OU (Open University) e a integridade dos dados.</p>
 <p>As avaliações finais no dataset correspondem a classe <em>“Exam”</em>, presente na variável <code>assessment_type</code>. No entanto, possuímos muitos valores missing nesta variável e sua importância para composição da nota final é muitas vezes dúbia. Isso por que encontramos estudantes que pontuaram 0 no <code>Exam</code> e ainda assim foram aprovados, assim como estudantes que não fizeram o teste e foram aprovados do mesmo jeito.</p>
@@ -2092,7 +2096,7 @@ Curso C
 <pre><code>## ✓ Fold10: preprocessor 1/1, model 5/5</code></pre>
 <pre><code>## i Fold10: preprocessor 1/1, model 5/5 (predictions)</code></pre>
 <div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="#cb230-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>## 158.663 sec elapsed</code></pre>
+<pre><code>## 160.551 sec elapsed</code></pre>
 <div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1"></a><span class="kw">kbl</span>(tune_results_rf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">show_best</span>(<span class="dt">metric =</span> <span class="st">&quot;rmse&quot;</span>)) <span class="op">%&gt;%</span></span>
 <span id="cb232-2"><a href="#cb232-2"></a><span class="st">  </span><span class="kw">kable_paper</span>(<span class="st">&quot;striped&quot;</span>) <span class="op">%&gt;%</span></span>
 <span id="cb232-3"><a href="#cb232-3"></a><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>)</span></code></pre></div>

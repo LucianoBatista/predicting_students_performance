@@ -2,6 +2,11 @@
 title: "Etapa 1: EDA"
 ---
 
+<style>
+body {
+text-align: justify}
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, dpi = 300, fig.align = "center", fig.width = 10, fig.height = 7)
 
@@ -162,6 +167,7 @@ courses_v1_tbl <- courses %>%
 skim(courses_v1_tbl)
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Neste dataset temos informações sobre os cursos oferecidos na base de dados. São sete no total e foram divididos de A a G, além disso temos também as data em que cada um deles passa a ser ofertado e sua duração em dias.
 
@@ -213,6 +219,7 @@ assessments_v2_tbl <- assessments %>%
 assessments_v2_tbl %>% skim()
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Esse dataset é onde estão os dados sobre as avaliações dos alunos, mais precisamente quando cada avaliação deve ser feita. Temos um total de 8 variáveis e quatro diferentes tipos: categórica, data, fator e numérico.
 
@@ -246,6 +253,7 @@ Ainda no intuito de relacionar performance e duração dos cursos precisamos che
 skim(student_assessment)
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Esse é um dataset maior que contém informações muito úteis sobre os scores de cada estudante em cada tipo de avaliação que foi realizada no semestre, e a data em que foi submetido.
 
@@ -257,6 +265,7 @@ Todas as variáveis são numéricas e com diferentes níveis de skewness. Além 
 skim(student_info)
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Novamente um dataset maior, com informações mais específicas sobre os estudantes:
 
@@ -329,6 +338,7 @@ skim(vle_v1_tbl)
 
 
 ```
+<p style="margin-bottom:40px"></p>
 
 Aqui temos um registro de todos os materiais disponíveis na plataforma online da OU e também o período indicado para utilização do material. Também temos a presença de muitos valores missing (5243) na variável week_from e week_to.
 
@@ -375,8 +385,6 @@ inter %>%
 
 A partir do gráfico acima vemos que a OU (Open University) oferece diversos materiais para auxiliar seus estudantes. Além disso, com o passar do tempo, houve aumento da quantidade de material em recursos já disponíveis, assim como a **<span style="color:#12A661">adição de novos</span>**.
 <p style="margin-bottom:40px"></p>
-
-## Material de consulta
 
 ```{r}
 tot_material <- inter %>% group_by(year) %>% summarise(tot = sum(count)) %>% pull(tot)
@@ -1015,14 +1023,9 @@ Veja que a **<span style="color:#12A661">linha de tendência</span>**  apresenta
 
 ## Características por Região
 
-Observa-se insights interessantes sobre a localização desses estudantes. No **Sul do Reino Unido** está localizado a **<span style="color:#12A661">maior parcela</span>** dos estudantes que estiveram matriculados na OU e em segundo lugar a Escócia.
+E por fim, vamos dar uma olhada nos dados demográficos.
 
-Também nota-se que existe maior número de homens do que mulheres, aproximadamente **36% a mais**.
-
-Vemos que a maior fatia dos estudantes possuem entre **0 e 35 anos**, e novamente o Sul e a Escócia concentra maior parcela.]
-
-
-```{r, out.height="100%", out.height="100%", fig.align="center"}
+```{r, out.width="100%", fig.align="center"}
 # alterando nomes das regiões pelo nome correto
 assem_demog_info_v2_tbl <- assem_demog_info_v1_tbl %>% 
   mutate(region = case_when(region == "East Anglian Region" ~ "East of England",
@@ -1066,7 +1069,7 @@ assem_demog_info_v3_tbl <- bind_rows(assem_demog_info_v2_tbl, assem_demog_info_v
 
 
 # para trabalhar com mapas, iremos utilizar um tipo de arquivo chamado shapefiles
-# o mesmo pode ser encontrado na internet: LINK
+# o mesmo pode ser encontrado na internet
 uk_map <- read_sf("data/shapefile/NUTS_Level_1__January_2018__Boundaries-shp/NUTS_Level_1__January_2018__Boundaries.shp")
 
 uk_map_filter_quantity_students <- assem_demog_info_v3_tbl %>% 
@@ -1126,31 +1129,9 @@ interactive_plot_ageband
 ```
 <p style="margin-bottom:40px"></p>
 
-## Auxiliando na Tomada de Decisão!
+Veja que no **Sul do Reino Unido** está localizado a **<span style="color:#12A661">maior parcela</span>** dos estudantes que estiveram matriculados na OU e em segundo lugar a Escócia.
 
-- Pode ser interessante um replanejamento dos cursos de menor duração, e assim tentar diminuir a taxa de reprovação nos respectivos períodos.
+Também nota-se que existe maior número de homens do que mulheres, aproximadamente **36% a mais**.
 
-- Alguns cursos precisam ser estudadas em mais detalhes: 
-  - Cursos B e G: Entender quais fatores são mais determinantes para as mulheres optarem por esses cursos. 
-  - Curso A: Avaliar quais parâmetros fazem este curso ter altas taxas de aprovação, e assim tentar replicar para outros cursos.]
-<p style="margin-bottom:40px"></p>
-
-## Auxiliando na Tomada de Decisão!
-
-- Os dados mostram que existe maior acesso à plataforma por estudantes de alto desempenho. Sendo assim, pode ser importante o incentivo mais efetivo ao uso da plaforma online.
-
-- Os perfis de acesso à plataforma mostram picos de acesso ao longo de um determinado periodo e curso. Esses perfis podem ser importantes para o time de Data Science prever a demanda de acesso à plataforma, evitando assim quedas no servidor devido ao aumento tráfego.
-
-- Algumas ações de marketing podem ser importantes para promover avanço nos negócios:
- - Promover o curso em outras regiões do Reino Unido, além do Sul e da Escócia, pois esses concentram maior parte dos estudantes.
- - Promover os cursos para pessoas de faixa-etária acima dos 35 anos, assim como para o público feminino.
-
-
-### [LinkedIn](https://www.linkedin.com/in/lucianobatistads/)
-
-### [GitHub](https://github.com/LucianoBatista)
-
-### [Blog](https://lobdata.com.br/)
-
-### [Fonte dos dados](https://www.nature.com/articles/sdata2017171)
+Vemos que a maior fatia dos estudantes possuem entre **0 e 35 anos**, e novamente o Sul e a Escócia concentra maior parcela.
 

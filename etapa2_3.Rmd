@@ -2,6 +2,11 @@
 title: "Etapa 2 e 3"
 ---
 
+<style>
+body {
+text-align: justify}
+</style>
+
 As etapas 2 e 3 foram destinadas para modelagem. O problema escolhido foi o de predizer o desempenho dos estudantes nas avaliações finais e além disso, o candidato deve avaliar a qualidade e precisão do modelo.
 
 No entanto algumas ressalvas precisam ser feitas: em relação a task pedida, a documentação da OU (Open University) e a integridade dos dados.
