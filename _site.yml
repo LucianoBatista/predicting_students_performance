@@ -1,7 +1,7 @@
 name: "trybe_data_scientist_case"
 output_dir: "docs"
 navbar:
-  title: "DS"
+  title: "Processo Seletivo - Data Scientist"
   left:
   - text: "Home"
     href: index.html
@@ -9,6 +9,8 @@ navbar:
     href: etapa1_eda.html
   - text: "Etapa 2 e 3"
     href: etapa2_3.html
+  - text: "Etapa 4"
+    href: etapa4.html
 output:
   html_document:
     theme: cosmo
