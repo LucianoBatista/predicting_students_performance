@@ -1,7 +1,7 @@
-name: "trybe_data_scientist_case"
+name: "data_scientist_case"
 output_dir: "docs"
 navbar:
-  title: "Processo Seletivo - Data Scientist"
+  title: "Data Scientist"
   left:
   - text: "Home"
     href: index.html
