@@ -1,7 +1,7 @@
 name: "data_scientist_case"
 output_dir: "docs"
 navbar:
-  title: "Data Scientist"
+  title: "Student Performance Case"
   left:
   - text: "Home"
     href: index.html
